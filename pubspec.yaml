@@ -1,0 +1,19 @@
+name: chartee
+description: The chart widget library for the Chargee app
+version: 0.0.1
+homepage: https://bitbucket.org/chargee/chartee
+
+environment:
+  sdk: ">=3.1.0 <4.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  collection: ^1.17.2
+  equatable: ^2.0.5
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^2.0.0
+  flutter_test:
+    sdk: flutter
