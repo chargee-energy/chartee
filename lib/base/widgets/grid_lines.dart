@@ -2,9 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../models/chart_line.dart';
 
+/// A widget to render the grid lines of a chart based on the information
+/// provided by [ChartLine] objects. This widget is used for rendering the
+/// lines of both the x-axis and the y-axis.
 class GridLines<Value extends num> extends StatelessWidget {
+  /// The axis of the lines (x-axis = horizontal, y-axis = vertical)
   final Axis axis;
+
+  /// The values of the lines, these will be passed to the [getLine] function.
   final List<Value> values;
+
+  /// A function to get the line for a specific value.
   final ChartLine Function(Value value)? getLine;
 
   const GridLines({
@@ -26,8 +34,8 @@ class GridLines<Value extends num> extends StatelessWidget {
         (value) {
           final line = getLine?.call(value) ?? const ChartLine();
           return SizedBox(
-            width: axis == Axis.horizontal ? line.strokeWidth : null,
-            height: axis == Axis.vertical ? line.strokeWidth : null,
+            width: axis == Axis.horizontal ? line.width : null,
+            height: axis == Axis.vertical ? line.width : null,
             child: CustomPaint(
               painter: _ChartLinePainter(
                 line: line,

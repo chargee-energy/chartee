@@ -3,9 +3,17 @@ import 'package:flutter/material.dart';
 import '../models/bar_chart_bar_stack.dart';
 import 'bar.dart';
 
+/// A widget that renders a stack of bars based on the information provided by
+/// a [BarChartBarStack].
 class BarStack extends StatelessWidget {
-  final BarChartBarStack? stack;
+  /// The rendering information for this stack.
+  final BarChartBarStack stack;
+
+  /// The alignment of the bars in the stack, should be [Alignment.bottomCenter]
+  /// for positive bars and [Alignment.topCenter] for negative bars.
   final Alignment alignment;
+
+  /// The max value used for scaling the bars.
   final double maxValue;
 
   const BarStack({
@@ -17,12 +25,6 @@ class BarStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stack = this.stack;
-
-    if (stack == null) {
-      return Container();
-    }
-
     return Align(
       alignment: alignment,
       child: FractionallySizedBox(
