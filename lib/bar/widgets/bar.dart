@@ -24,6 +24,12 @@ class Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final heightFactor = bar.value / maxValue;
+
+    if (heightFactor == 0) {
+      return Container();
+    }
+
     return FractionallySizedBox(
       heightFactor: bar.value / maxValue,
       child: SizedBox(

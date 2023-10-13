@@ -29,15 +29,16 @@ class ChartBase extends StatelessWidget {
     final horizontalLabelsSize =
         calculateTextSize('0', data.labels.horizontal.style);
 
-    final chartPadding = EdgeInsets.only(
-      bottom: data.labels.horizontal.visible
-          ? horizontalLabelsSize.height +
-              data.labels.horizontal.padding.vertical
-          : 0,
-    );
+    final chartPadding = data.padding +
+        EdgeInsets.only(
+          bottom: data.labels.horizontal.visible
+              ? horizontalLabelsSize.height +
+                  data.labels.horizontal.padding.vertical
+              : 0,
+        );
 
     final verticalLines = Padding(
-      padding: chartPadding,
+      padding: chartPadding.copyWith(left: 0, right: 0),
       child: GridLines(
         axis: Axis.vertical,
         values: lines.reversed.toList(),
@@ -54,10 +55,11 @@ class ChartBase extends StatelessWidget {
           children: [
             if (data.labels.vertical.visible)
               Padding(
-                padding: data.labels.vertical.padding.copyWith(
-                  bottom:
-                      chartPadding.bottom + data.labels.vertical.padding.bottom,
-                ),
+                padding: data.labels.vertical.padding +
+                    EdgeInsets.only(
+                      top: chartPadding.top,
+                      bottom: chartPadding.bottom,
+                    ),
                 child: VerticalLabels(
                   lines: lines,
                   labels: data.labels.vertical,
@@ -85,7 +87,8 @@ class ChartBase extends StatelessWidget {
                     Align(
                       alignment: Alignment.bottomLeft,
                       child: Padding(
-                        padding: data.labels.horizontal.padding,
+                        padding: data.labels.horizontal.padding +
+                            data.padding.copyWith(top: 0, bottom: 0),
                         child: HorizontalLabels(data: data),
                       ),
                     ),

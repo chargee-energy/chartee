@@ -18,7 +18,7 @@ class ChartAxisLabels<Value extends num> with EquatableMixin {
   final TextStyle? style;
 
   /// A function to get the text that should be rendered in a label.
-  final String Function(Value value)? getLabelText;
+  final String? Function(Value value)? getLabelText;
 
   const ChartAxisLabels({
     this.visible = false,

@@ -14,18 +14,25 @@ class HorizontalLabels extends StatelessWidget {
       builder: (context, constraints) {
         final itemWidth = constraints.maxWidth / data.items.length;
         return Stack(
-          children: data.items.mapIndexed((index, item) {
-            final offset = index * itemWidth + itemWidth / 2;
-            final text = data.labels.horizontal.getLabelText?.call(item.x) ??
-                item.x.toString();
-            return FractionalTranslation(
-              translation: Offset(data.labels.horizontal.offset - 0.5, 0),
-              child: Transform.translate(
-                offset: Offset(offset, 0),
-                child: Text(text, style: data.labels.horizontal.style),
-              ),
-            );
-          }).toList(),
+          children: data.items
+              .mapIndexed((index, item) {
+                final offset = index * itemWidth + itemWidth / 2;
+                final text = data.labels.horizontal.getLabelText?.call(item.x);
+
+                if (text == null) {
+                  return null;
+                }
+
+                return FractionalTranslation(
+                  translation: Offset(data.labels.horizontal.offset - 0.5, 0),
+                  child: Transform.translate(
+                    offset: Offset(offset, 0),
+                    child: Text(text, style: data.labels.horizontal.style),
+                  ),
+                );
+              })
+              .whereNotNull()
+              .toList(),
         );
       },
     );

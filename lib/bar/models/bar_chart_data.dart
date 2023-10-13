@@ -21,5 +21,6 @@ class BarChartData extends ChartData<BarChartItem> {
     required super.grid,
     required super.labels,
     required super.items,
+    super.padding,
   });
 }

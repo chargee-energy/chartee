@@ -25,6 +25,12 @@ class BarStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final heightFactor = stack.maxY / maxValue;
+
+    if (heightFactor == 0) {
+      return Container();
+    }
+
     return Align(
       alignment: alignment,
       child: FractionallySizedBox(
