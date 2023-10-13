@@ -1,34 +1,21 @@
 import 'package:equatable/equatable.dart';
 
-import 'chart_line.dart';
+import 'chart_axis_lines.dart';
 
 /// A model to determine which lines should be rendered and what they will look
 /// like when a chart renders the grid.
 class ChartGrid with EquatableMixin {
-  /// Whether to show lines on the y-axis
-  final bool showVertical;
+  /// The lines to show on the y-axis.
+  final ChartAxisLines<double> vertical;
 
-  /// Whether to show lines on the x-axis
-  final bool showHorizontal;
-
-  /// A function to get the rendering information for a line on the y-axis
-  final ChartLine Function(double value)? getVerticalLine;
-
-  /// A function to get the rendering information for a line on the x-axis
-  final ChartLine Function(int value)? getHorizontalLine;
+  /// The lines to show on the x-axis.
+  final ChartAxisLines<int> horizontal;
 
   const ChartGrid({
-    this.showHorizontal = true,
-    this.showVertical = true,
-    this.getHorizontalLine,
-    this.getVerticalLine,
+    this.vertical = const ChartAxisLines(),
+    this.horizontal = const ChartAxisLines(),
   });
 
   @override
-  List<Object?> get props => [
-        showVertical,
-        showHorizontal,
-        getVerticalLine,
-        getHorizontalLine,
-      ];
+  List<Object?> get props => [vertical, horizontal];
 }

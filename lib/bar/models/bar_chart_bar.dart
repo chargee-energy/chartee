@@ -27,5 +27,5 @@ class BarChartBar with EquatableMixin {
   });
 
   @override
-  List<Object?> get props => [value, width, color, borderRadius];
+  List<Object?> get props => [value, color, width, borderRadius];
 }

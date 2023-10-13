@@ -65,7 +65,7 @@ class _ChartLinePainter extends CustomPainter {
     final paint = Paint()..color = line.color;
 
     if (dashArray == null || dashArray.length != 2) {
-      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
+      canvas.drawRect(Offset.zero & size, paint);
       return;
     }
 
@@ -75,7 +75,7 @@ class _ChartLinePainter extends CustomPainter {
         : size.height / dashTotalSize;
 
     canvas.save();
-    canvas.clipRect(Rect.fromLTRB(0, 0, size.width, size.height));
+    canvas.clipRect(Offset.zero & size);
 
     for (var i = 0; i < numberOfDashes; i++) {
       final offset = i * dashTotalSize;

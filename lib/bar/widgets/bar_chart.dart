@@ -38,27 +38,31 @@ class BarChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (positiveStack != null && maxY > 0)
+        if (maxY > 0)
           Expanded(
             flex: (centerFraction * 100).toInt(),
-            child: BarStack(
-              stack: positiveStack,
-              alignment: Alignment.bottomCenter,
-              maxValue: maxY,
-            ),
+            child: positiveStack != null
+                ? BarStack(
+                    stack: positiveStack,
+                    alignment: Alignment.bottomCenter,
+                    maxValue: maxY,
+                  )
+                : Container(),
           ),
         SizedBox(
           height:
-              (data.grid.getVerticalLine?.call(0) ?? const ChartLine()).width,
+              (data.grid.vertical.getLine?.call(0) ?? const ChartLine()).width,
         ),
-        if (negativeStack != null && minY > 0)
+        if (minY > 0)
           Expanded(
             flex: ((1 - centerFraction) * 100).toInt(),
-            child: BarStack(
-              stack: negativeStack,
-              alignment: Alignment.topCenter,
-              maxValue: minY,
-            ),
+            child: negativeStack != null
+                ? BarStack(
+                    stack: negativeStack,
+                    alignment: Alignment.topCenter,
+                    maxValue: minY,
+                  )
+                : Container(),
           ),
       ],
     );

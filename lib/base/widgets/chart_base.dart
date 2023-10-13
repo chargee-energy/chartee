@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../models/chart_data.dart';
 import '../utils/line.dart';
+import '../utils/text.dart';
 import 'grid_lines.dart';
+import 'horizontal_labels.dart';
+import 'vertical_labels.dart';
 
 /// A widget to render all shared elements of a chart like the grid and labels.
 ///
@@ -23,21 +26,78 @@ class ChartBase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lines = getLineValues(data.minY, data.maxY);
+    final horizontalLabelsSize =
+        calculateTextSize('0', data.labels.horizontal.style);
+
+    final chartPadding = EdgeInsets.only(
+      bottom: data.labels.horizontal.visible
+          ? horizontalLabelsSize.height +
+              data.labels.horizontal.padding.vertical
+          : 0,
+    );
+
+    final verticalLines = Padding(
+      padding: chartPadding,
+      child: GridLines(
+        axis: Axis.vertical,
+        values: lines.reversed.toList(),
+        getLine: data.grid.vertical.getLine,
+      ),
+    );
+
     return Stack(
       children: [
-        if (data.grid.showVertical)
-          GridLines(
-            axis: Axis.vertical,
-            values: lines.reversed.toList(),
-            getLine: data.grid.getVerticalLine,
-          ),
-        if (data.grid.showHorizontal)
-          GridLines(
-            axis: Axis.horizontal,
-            values: data.items.map((item) => item.x).toList(),
-            getLine: data.grid.getHorizontalLine,
-          ),
-        builder(context, lines),
+        if (data.grid.vertical.visible && data.grid.vertical.extendBehindLabels)
+          verticalLines,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (data.labels.vertical.visible)
+              Padding(
+                padding: data.labels.vertical.padding.copyWith(
+                  bottom:
+                      chartPadding.bottom + data.labels.vertical.padding.bottom,
+                ),
+                child: VerticalLabels(
+                  lines: lines,
+                  labels: data.labels.vertical,
+                ),
+              ),
+            Expanded(
+              child: Stack(
+                children: [
+                  if (data.grid.vertical.visible &&
+                      !data.grid.vertical.extendBehindLabels)
+                    verticalLines,
+                  if (data.grid.horizontal.visible)
+                    Padding(
+                      padding: chartPadding.copyWith(
+                        bottom:
+                            data.grid.horizontal.extendBehindLabels ? 0 : null,
+                      ),
+                      child: GridLines(
+                        axis: Axis.horizontal,
+                        values: data.items.map((item) => item.x).toList(),
+                        getLine: data.grid.horizontal.getLine,
+                      ),
+                    ),
+                  if (data.labels.horizontal.visible)
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Padding(
+                        padding: data.labels.horizontal.padding,
+                        child: HorizontalLabels(data: data),
+                      ),
+                    ),
+                  Padding(
+                    padding: chartPadding,
+                    child: builder(context, lines),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }

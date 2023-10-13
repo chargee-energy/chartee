@@ -17,5 +17,9 @@ class BarChartData extends ChartData<BarChartItem> {
   @override
   double get maxY => items.map((item) => item.maxY).maxOrNull ?? 0;
 
-  const BarChartData({required super.grid, required super.items});
+  const BarChartData({
+    required super.grid,
+    required super.labels,
+    required super.items,
+  });
 }

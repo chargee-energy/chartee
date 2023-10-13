@@ -18,11 +18,7 @@ class ChartLine with EquatableMixin {
   /// space of 10 pixels.
   final List<int>? dashArray;
 
-  const ChartLine({
-    this.color = Colors.grey,
-    this.width = 1,
-    this.dashArray,
-  });
+  const ChartLine({this.color = Colors.grey, this.width = 1, this.dashArray});
 
   @override
   List<Object?> get props => [color, width, dashArray];

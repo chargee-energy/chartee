@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 /// Calculates the size of the provided text if when would be rendered with the
 /// provided style.
-///
-/// TODO: check if still needed
 Size calculateTextSize(String text, TextStyle? style) {
   final TextPainter textPainter = TextPainter(
     text: TextSpan(text: text, style: style),
