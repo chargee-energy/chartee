@@ -9,6 +9,9 @@ class BarChartBar with EquatableMixin {
   /// The color of the bar that will be drawn
   final Color color;
 
+  /// The color of the bar that will be drawn when highlighted
+  final Color? highlightColor;
+
   /// The width of the bar that will be drawn. The bar will be constraint by
   /// the stack that it is part of so higher values than it's stack won't make
   /// the bar wider.
@@ -22,6 +25,7 @@ class BarChartBar with EquatableMixin {
   const BarChartBar({
     required this.value,
     required this.color,
+    this.highlightColor,
     this.width,
     this.borderRadius = BorderRadius.zero,
   });

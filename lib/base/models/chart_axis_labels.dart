@@ -10,7 +10,7 @@ class ChartAxisLabels<Value extends num> with EquatableMixin {
   /// Padding to apply around the labels.
   final EdgeInsets padding;
 
-  /// Offset to apply to the label. `-0` means it will be centered with the
+  /// Offset to apply to the label. `0` means it will be centered with the
   /// line, `-0.5` will be before the line and `0.5` after the line.
   final double offset;
 

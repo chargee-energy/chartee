@@ -24,6 +24,9 @@ abstract class ChartData<Item extends ChartItem> with EquatableMixin {
   /// Padding to apply around the chart
   final EdgeInsets padding;
 
+  /// Padding to apply around the tooltip
+  final EdgeInsets tooltipPadding;
+
   /// The minimum value on the y-axis of the chart. This is an absolute value
   /// and should be converted to a negative value when needed.
   double get minY;
@@ -36,6 +39,7 @@ abstract class ChartData<Item extends ChartItem> with EquatableMixin {
     required this.labels,
     required this.items,
     this.padding = EdgeInsets.zero,
+    this.tooltipPadding = EdgeInsets.zero,
   });
 
   @override

@@ -16,11 +16,15 @@ class BarStack extends StatelessWidget {
   /// The max value used for scaling the bars.
   final double maxValue;
 
+  /// Whether this stack should be highlighted.
+  final bool highlight;
+
   const BarStack({
     super.key,
     required this.stack,
     required this.alignment,
     required this.maxValue,
+    required this.highlight,
   });
 
   @override
@@ -47,6 +51,7 @@ class BarStack extends StatelessWidget {
                       bar: bar,
                       alignment: alignment,
                       maxValue: stack.maxY,
+                      highlight: highlight,
                     ),
                   )
                   .toList(),

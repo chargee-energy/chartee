@@ -15,11 +15,15 @@ class Bar extends StatelessWidget {
   /// The max value used for scaling the bar.
   final double maxValue;
 
+  /// Whether this stack should be highlighted.
+  final bool highlight;
+
   const Bar({
     super.key,
     required this.bar,
     required this.alignment,
     required this.maxValue,
+    required this.highlight,
   });
 
   @override
@@ -36,7 +40,10 @@ class Bar extends StatelessWidget {
         width: bar.width,
         child: Container(
           decoration: BoxDecoration(
-            color: bar.color,
+            color: highlight
+                ? bar.highlightColor ??
+                    HSLColor.fromColor(bar.color).withLightness(0.7).toColor()
+                : bar.color,
             borderRadius: bar.borderRadius,
           ),
         ),
