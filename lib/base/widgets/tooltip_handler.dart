@@ -2,12 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-typedef Builder = Widget Function(
-  BuildContext context,
-  void Function(double centerX, int selectedIndex) showTooltip,
-  VoidCallback hideTooltip,
-);
-
 typedef TooltipBuilder = Widget Function(
   BuildContext context,
   Key key,
@@ -15,10 +9,24 @@ typedef TooltipBuilder = Widget Function(
   double arrowOffsetX,
 );
 
-/// TODO: Docs
+/// A widget to handle the positioning of a tooltip inside a chart.
 class TooltipHandler extends StatefulWidget {
+  /// Padding to apply to the tooltip, this means the tooltip will keep this
+  /// distance from the sides of it's parent.
   final EdgeInsets padding;
-  final Builder builder;
+
+  /// Builder function to render the children of this widget. The builder
+  /// supplies functions to show and hide the tooltip.
+  final Widget Function(
+    BuildContext context,
+    void Function(double centerX, int selectedIndex) showTooltip,
+    VoidCallback hideTooltip,
+  ) builder;
+
+  /// Builder function for the tooltip itself. The builder supplies the selected
+  /// index and an offset which can be applied to an arrow so this will stay
+  /// centered above the selected item even when the tooltip position is bound
+  /// by the size of it's parent.
   final TooltipBuilder tooltipBuilder;
 
   const TooltipHandler({

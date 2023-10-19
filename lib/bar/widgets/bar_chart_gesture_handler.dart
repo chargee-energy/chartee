@@ -11,11 +11,24 @@ class _BarDistance with EquatableMixin {
   List<Object?> get props => [index, distance];
 }
 
-/// TODO: Docs
+/// A widget to handle the gestures within a bar chart.
+///
+/// See also:
+///
+/// * [BarChart] The chart that uses this handler to determine which item will be highlighted.
 class BarChartGestureHandler extends StatefulWidget {
+  /// The number of bars that the chart contains. Used to calculate which bar
+  /// should capture the gesture.
   final int numberOfBars;
+
+  /// Builder function to render the children of this widget. The builder
+  /// supplies the currently selected bar index.
   final Widget Function(BuildContext context, int selectedIndex) builder;
+
+  /// Side effect that will be called when the selected bar index changes.
   final void Function(double centerX, int selectedIndex)? onChange;
+
+  /// Side effect that will be called when the gesture is ended.
   final VoidCallback? onReset;
 
   const BarChartGestureHandler({
