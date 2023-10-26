@@ -2,18 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-typedef TooltipBuilder = Widget Function(
-  BuildContext context,
-  Key key,
-  int selectedIndex,
-  double arrowOffsetX,
-);
+import '../models/chart_tooltip.dart';
 
 /// A widget to handle the positioning of a tooltip inside a chart.
-class TooltipHandler extends StatefulWidget {
-  /// Padding to apply to the tooltip, this means the tooltip will keep this
-  /// distance from the sides of it's parent.
-  final EdgeInsets padding;
+class TooltipHandler extends StatelessWidget {
+  /// The information that will be used to render the chart tooltip.
+  final ChartTooltip tooltip;
 
   /// Builder function to render the children of this widget. The builder
   /// supplies functions to show and hide the tooltip.
@@ -23,24 +17,50 @@ class TooltipHandler extends StatefulWidget {
     VoidCallback hideTooltip,
   ) builder;
 
-  /// Builder function for the tooltip itself. The builder supplies the selected
-  /// index and an offset which can be applied to an arrow so this will stay
-  /// centered above the selected item even when the tooltip position is bound
-  /// by the size of it's parent.
-  final TooltipBuilder tooltipBuilder;
-
   const TooltipHandler({
     super.key,
-    this.padding = EdgeInsets.zero,
+    required this.tooltip,
     required this.builder,
-    required this.tooltipBuilder,
   });
 
   @override
-  State<TooltipHandler> createState() => _TooltipHandlerState();
+  Widget build(BuildContext context) {
+    if (!tooltip.enabled) {
+      return builder(context, (_, __) {}, () {});
+    }
+
+    if (tooltip.sticky) {
+      return _StickyTooltipHandler(tooltip: tooltip, builder: builder);
+    }
+
+    return _DefaultTooltipHandler(tooltip: tooltip, builder: builder);
+  }
 }
 
-class _TooltipHandlerState extends State<TooltipHandler> {
+/// TODO: Docs
+class _DefaultTooltipHandler extends StatefulWidget {
+  /// The information that will be used to render the chart tooltip.
+  final ChartTooltip tooltip;
+
+  /// Builder function to render the children of this widget. The builder
+  /// supplies functions to show and hide the tooltip.
+  final Widget Function(
+    BuildContext context,
+    void Function(double centerX, int selectedIndex) showTooltip,
+    VoidCallback hideTooltip,
+  ) builder;
+
+  const _DefaultTooltipHandler({
+    super.key,
+    required this.tooltip,
+    required this.builder,
+  });
+
+  @override
+  State<_DefaultTooltipHandler> createState() => _DefaultTooltipHandlerState();
+}
+
+class _DefaultTooltipHandlerState extends State<_DefaultTooltipHandler> {
   final _tooltipKey = GlobalKey();
   int _selectedIndex = -1;
   bool _offstage = true;
@@ -59,8 +79,10 @@ class _TooltipHandlerState extends State<TooltipHandler> {
       final localCenterX = ownBox.globalToLocal(Offset(centerX, 0)).dx;
 
       final left = min(
-        (ownBox.size.width - widget.padding.right) - tooltipBox.size.width,
-        max(widget.padding.left, localCenterX - tooltipBox.size.width / 2),
+        (ownBox.size.width - widget.tooltip.padding.right) -
+            tooltipBox.size.width,
+        max(widget.tooltip.padding.left,
+            localCenterX - tooltipBox.size.width / 2),
       );
 
       final tooltipCenterX = left + tooltipBox.size.width / 2;
@@ -85,16 +107,17 @@ class _TooltipHandlerState extends State<TooltipHandler> {
 
   @override
   Widget build(BuildContext context) {
+    final getTooltip = widget.tooltip.getTooltip;
     return Stack(
       children: [
         Positioned(
-          top: widget.padding.top,
-          bottom: widget.padding.bottom,
+          top: widget.tooltip.padding.top,
+          bottom: widget.tooltip.padding.bottom,
           left: _tooltipLeft,
           child: Offstage(
             offstage: _offstage,
-            child: _selectedIndex != -1
-                ? widget.tooltipBuilder(
+            child: _selectedIndex != -1 && getTooltip != null
+                ? getTooltip(
                     context,
                     _tooltipKey,
                     _selectedIndex,
@@ -104,6 +127,83 @@ class _TooltipHandlerState extends State<TooltipHandler> {
           ),
         ),
         widget.builder(context, _showTooltip, _hideTooltip),
+      ],
+    );
+  }
+}
+
+/// TODO: Docs
+class _StickyTooltipHandler extends StatefulWidget {
+  /// The information that will be used to render the chart tooltip.
+  final ChartTooltip tooltip;
+
+  /// Builder function to render the children of this widget. The builder
+  /// supplies functions to show and hide the tooltip.
+  final Widget Function(
+    BuildContext context,
+    void Function(double centerX, int selectedIndex) showTooltip,
+    VoidCallback hideTooltip,
+  ) builder;
+
+  const _StickyTooltipHandler({
+    super.key,
+    required this.tooltip,
+    required this.builder,
+  });
+
+  @override
+  State<_StickyTooltipHandler> createState() => _StickyTooltipHandlerState();
+}
+
+class _StickyTooltipHandlerState extends State<_StickyTooltipHandler> {
+  final _tooltipKey = GlobalKey();
+  int _selectedIndex = 0;
+  double _arrowOffsetX = 0;
+
+  void _updateTooltip(double centerX, int selectedIndex) {
+    setState(() {
+      _selectedIndex = selectedIndex;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ownBox = context.findRenderObject() as RenderBox;
+      final tooltipBox =
+          _tooltipKey.currentContext?.findRenderObject() as RenderBox;
+      final localCenterX = ownBox.globalToLocal(Offset(centerX, 0)).dx;
+
+      final left = min(
+        (ownBox.size.width - widget.tooltip.padding.right) -
+            tooltipBox.size.width,
+        max(widget.tooltip.padding.left,
+            localCenterX - tooltipBox.size.width / 2),
+      );
+
+      final tooltipCenterX = left + tooltipBox.size.width / 2;
+      final arrowOffsetX = localCenterX - tooltipCenterX;
+
+      setState(() {
+        _arrowOffsetX = arrowOffsetX;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final getTooltip = widget.tooltip.getTooltip;
+    return Stack(
+      children: [
+        Padding(
+          padding: widget.tooltip.padding,
+          child: getTooltip != null
+              ? getTooltip(
+                  context,
+                  _tooltipKey,
+                  _selectedIndex,
+                  _arrowOffsetX,
+                )
+              : Container(key: _tooltipKey),
+        ),
+        widget.builder(context, _updateTooltip, () {}),
       ],
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../models/chart_data.dart';
 
+/// TODO: Docs
 class HorizontalLabels extends StatelessWidget {
   final ChartData data;
 

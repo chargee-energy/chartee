@@ -10,3 +10,4 @@ export 'base/models/chart_axis_lines.dart';
 export 'base/models/chart_grid.dart';
 export 'base/models/chart_labels.dart';
 export 'base/models/chart_line.dart';
+export 'base/models/chart_tooltip.dart';

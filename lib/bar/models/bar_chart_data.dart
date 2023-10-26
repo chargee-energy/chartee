@@ -20,8 +20,8 @@ class BarChartData extends ChartData<BarChartItem> {
   const BarChartData({
     required super.grid,
     required super.labels,
+    required super.tooltip,
     required super.items,
     super.padding,
-    super.tooltipPadding,
   });
 }

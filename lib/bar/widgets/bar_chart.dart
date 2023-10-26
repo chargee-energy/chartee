@@ -17,35 +17,25 @@ class BarChart extends StatelessWidget {
   /// The data that will be rendered in the chart.
   final BarChartData data;
 
-  /// Builder function to show a tooltip when a bar is highlighted.
-  final TooltipBuilder tooltipBuilder;
-
-  /// Whether the tooltip should be shown for a specific index.
-  final bool Function(int index) shouldShowTooltip;
-
-  const BarChart({
-    super.key,
-    required this.data,
-    required this.tooltipBuilder,
-    required this.shouldShowTooltip,
-  });
+  const BarChart({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
     final horizontalLabelsSize =
         calculateTextSize('0', data.labels.horizontal.style);
     return TooltipHandler(
-      padding: data.tooltipPadding +
-          EdgeInsets.only(
-              bottom: horizontalLabelsSize.height +
-                  data.labels.horizontal.padding.vertical),
-      tooltipBuilder: tooltipBuilder,
+      tooltip: data.tooltip.addPadding(
+        EdgeInsets.only(
+          bottom: horizontalLabelsSize.height +
+              data.labels.horizontal.padding.vertical,
+        ),
+      ),
       builder: (context, showTooltip, hideTooltip) => ChartBase(
         data: data,
         builder: (context, lines) => BarChartGestureHandler(
           numberOfBars: data.items.length,
           onChange: (centerX, selectedIndex) {
-            if (shouldShowTooltip(selectedIndex)) {
+            if (data.tooltip.shouldShow?.call(selectedIndex) ?? true) {
               HapticFeedback.selectionClick();
               showTooltip(centerX, selectedIndex);
             } else {

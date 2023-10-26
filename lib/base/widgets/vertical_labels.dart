@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../models/chart_axis_labels.dart';
 
+/// TODO: Docs
 class VerticalLabels extends StatelessWidget {
   final List<double> lines;
   final ChartAxisLabels<double> labels;

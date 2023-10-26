@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'chart_grid.dart';
 import 'chart_item.dart';
 import 'chart_labels.dart';
+import 'chart_tooltip.dart';
 
 /// A base class for the data that will be passed to a chart widget. This class
 /// has specific implementations for each kind of chart.
@@ -12,20 +13,20 @@ import 'chart_labels.dart';
 ///
 ///  * [BarChartData], for an implementation used in a bar chart.
 abstract class ChartData<Item extends ChartItem> with EquatableMixin {
-  /// The information that will be used to render the chart grid
+  /// The information that will be used to render the chart grid.
   final ChartGrid grid;
 
-  /// The information that will be used to render the chart labels
+  /// The information that will be used to render the chart labels.
   final ChartLabels labels;
+
+  /// The information that will be used to render the chart tooltip.
+  final ChartTooltip tooltip;
 
   /// The items that will be plotted to the chart.
   final List<Item> items;
 
-  /// Padding to apply around the chart
+  /// Padding to apply around the chart.
   final EdgeInsets padding;
-
-  /// Padding to apply around the tooltip
-  final EdgeInsets tooltipPadding;
 
   /// The minimum value on the y-axis of the chart. This is an absolute value
   /// and should be converted to a negative value when needed.
@@ -37,11 +38,11 @@ abstract class ChartData<Item extends ChartItem> with EquatableMixin {
   const ChartData({
     required this.grid,
     required this.labels,
+    required this.tooltip,
     required this.items,
     this.padding = EdgeInsets.zero,
-    this.tooltipPadding = EdgeInsets.zero,
   });
 
   @override
-  List<Object?> get props => [grid, labels, items, padding];
+  List<Object?> get props => [grid, labels, tooltip, items, padding];
 }
