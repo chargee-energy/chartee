@@ -17,7 +17,10 @@ class BarChart extends StatelessWidget {
   /// The data that will be rendered in the chart.
   final BarChartData data;
 
-  const BarChart({super.key, required this.data});
+  /// Initial index to highlight.
+  final int? initialIndex;
+
+  const BarChart({super.key, required this.data, this.initialIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +46,7 @@ class BarChart extends StatelessWidget {
             }
           },
           onReset: hideTooltip,
+          initialIndex: initialIndex,
           builder: (context, selectedIndex) => Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: data.items

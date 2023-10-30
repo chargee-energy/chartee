@@ -31,12 +31,16 @@ class BarChartGestureHandler extends StatefulWidget {
   /// Side effect that will be called when the gesture is ended.
   final VoidCallback? onReset;
 
+  /// Initial index to highlight.
+  final int? initialIndex;
+
   const BarChartGestureHandler({
     super.key,
     required this.numberOfBars,
     required this.builder,
     this.onChange,
     this.onReset,
+    this.initialIndex,
   });
 
   @override
@@ -46,7 +50,18 @@ class BarChartGestureHandler extends StatefulWidget {
 class _BarChartGestureHandlerState extends State<BarChartGestureHandler> {
   int _selectedIndex = -1;
 
-  double getBarCenterX({required int index, bool local = false}) {
+  @override
+  void initState() {
+    super.initState();
+    final index = widget.initialIndex;
+    if (index != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _setSelectedIndex(index);
+      });
+    }
+  }
+
+  double _getBarCenterX({required int index, bool local = false}) {
     final renderBox = context.findRenderObject() as RenderBox;
     final barWidth = renderBox.size.width / widget.numberOfBars;
     final localCenterX = barWidth * (index + 0.5);
@@ -65,7 +80,7 @@ class _BarChartGestureHandlerState extends State<BarChartGestureHandler> {
     ).fold(
       const _BarDistance(index: -1, distance: double.infinity),
       (previousValue, index) {
-        final barCenterX = getBarCenterX(index: index, local: true);
+        final barCenterX = _getBarCenterX(index: index, local: true);
         final distance = offset.dx - barCenterX;
         return distance.abs() < previousValue.distance
             ? _BarDistance(index: index, distance: distance.abs())
@@ -80,7 +95,7 @@ class _BarChartGestureHandlerState extends State<BarChartGestureHandler> {
     if (index != _selectedIndex) {
       final onChange = widget.onChange;
       if (onChange != null) {
-        onChange(getBarCenterX(index: index), index);
+        onChange(_getBarCenterX(index: index), index);
       }
       setState(() {
         _selectedIndex = index;
