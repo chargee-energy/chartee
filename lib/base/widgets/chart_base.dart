@@ -53,9 +53,10 @@ class ChartBase extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(
         top: max(
-          0,
-          verticalLabelsSize.height * -(data.labels.vertical.offset * 2),
-        ),
+              0,
+              verticalLabelsSize.height * -(data.labels.vertical.offset * 2),
+            ) +
+            data.tooltip.padding.bottom,
       ),
       child: Stack(
         children: [
