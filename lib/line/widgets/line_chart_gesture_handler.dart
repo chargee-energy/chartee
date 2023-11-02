@@ -124,14 +124,14 @@ class _LineChartGestureHandlerState extends State<LineChartGestureHandler> {
         }
       },
       onTapUp: (_) => _resetSelectedIndex(),
-      onPanUpdate: (details) {
+      onHorizontalDragUpdate: (details) {
         final index = _findIndexForOffset(details.localPosition);
         if (index != -1) {
           _setSelectedIndex(index);
         }
       },
-      onPanEnd: (_) => _resetSelectedIndex(),
-      onPanCancel: () => _resetSelectedIndex(),
+      onHorizontalDragEnd: (_) => _resetSelectedIndex(),
+      onHorizontalDragCancel: () => _resetSelectedIndex(),
       child: widget.builder(context, _selectedIndex),
     );
   }
