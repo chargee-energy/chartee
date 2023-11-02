@@ -32,7 +32,7 @@ class LineChart extends StatelessWidget {
         data: data,
         xAxisAlignment: XAxisAlignment.spaceBetween,
         builder: (context, lines) => LineChartGestureHandler(
-            numberOfPoints: data.items.length,
+            items: data.items,
             onChange: (centerX, selectedIndex) {
               if (data.tooltip.shouldShow?.call(selectedIndex) ?? true) {
                 HapticFeedback.selectionClick();

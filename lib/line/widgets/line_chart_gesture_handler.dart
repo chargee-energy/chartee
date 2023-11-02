@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+import '../models/line_chart_item.dart';
+
 /// TODO: Refactor with bar handler
 
 class _PointDistance with EquatableMixin {
@@ -19,9 +21,8 @@ class _PointDistance with EquatableMixin {
 ///
 /// * [LineChart] The chart that uses this handler to determine which item will be highlighted.
 class LineChartGestureHandler extends StatefulWidget {
-  /// The number of points that the chart contains. Used to calculate which point
-  /// should capture the gesture.
-  final int numberOfPoints;
+  /// TODO
+  final List<LineChartItem> items;
 
   /// Builder function to render the children of this widget. The builder
   /// supplies the currently selected point index.
@@ -38,7 +39,7 @@ class LineChartGestureHandler extends StatefulWidget {
 
   const LineChartGestureHandler({
     super.key,
-    required this.numberOfPoints,
+    required this.items,
     required this.builder,
     this.onChange,
     this.onReset,
@@ -66,8 +67,7 @@ class _LineChartGestureHandlerState extends State<LineChartGestureHandler> {
 
   double _getPointX({required int index, bool local = false}) {
     final renderBox = context.findRenderObject() as RenderBox;
-    final offset = renderBox.size.width / (widget.numberOfPoints - 1);
-    final x = index * offset;
+    final x = renderBox.size.width * widget.items[index].xPercentage;
 
     if (local) {
       return x;
@@ -78,7 +78,7 @@ class _LineChartGestureHandlerState extends State<LineChartGestureHandler> {
 
   int _findIndexForOffset(Offset offset) {
     final nearestPoint = List.generate(
-      widget.numberOfPoints,
+      widget.items.length,
       (index) => index,
     ).fold(
       const _PointDistance(index: -1, distance: double.infinity),

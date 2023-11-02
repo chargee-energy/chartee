@@ -28,7 +28,7 @@ class LineChartData extends ChartData<LineChartItem> {
       min(items.map((item) => item.y).minOrNull ?? 0, 0).abs().toDouble();
 
   @override
-  double get maxY => items.map((item) => item.y).maxOrNull ?? 0;
+  double get maxY => max(items.map((item) => item.y).maxOrNull ?? 0, 0);
 
   const LineChartData({
     required this.colorPositiveLine,
