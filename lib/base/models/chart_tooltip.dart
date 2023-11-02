@@ -24,6 +24,8 @@ class ChartTooltip with EquatableMixin {
   /// index and an offset which can be applied to an arrow so this will stay
   /// centered above the selected item even when the tooltip position is bound
   /// by the size of it's parent.
+  ///
+  /// Note: make sure the supplied key is applied to the top level widget or tooltip won't work
   final Widget Function(
     BuildContext context,
     Key key,

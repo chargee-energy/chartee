@@ -1,11 +1,13 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../base/utils/text.dart';
 import '../../base/widgets/chart_base.dart';
 import '../../base/widgets/tooltip_handler.dart';
 import '../models/line_chart_data.dart';
 import '../models/line_chart_item.dart';
+import 'line_chart_gesture_handler.dart';
 
 /// A widget to render a line chart. Uses [ChartBase] to render the basic
 /// elements of the chart and renders the line on top of that.
@@ -29,16 +31,29 @@ class LineChart extends StatelessWidget {
       builder: (context, showTooltip, hideTooltip) => ChartBase(
         data: data,
         xAxisAlignment: XAxisAlignment.spaceBetween,
-        builder: (context, lines) => Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: CustomPaint(
-                painter: _LineChartPainter(data: data, lines: lines),
-              ),
-            ),
-          ],
-        ),
+        builder: (context, lines) => LineChartGestureHandler(
+            numberOfPoints: data.items.length,
+            onChange: (centerX, selectedIndex) {
+              if (data.tooltip.shouldShow?.call(selectedIndex) ?? true) {
+                HapticFeedback.selectionClick();
+                showTooltip(centerX, selectedIndex);
+              } else {
+                hideTooltip();
+              }
+            },
+            onReset: hideTooltip,
+            builder: (context, selectedIndex) {
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: CustomPaint(
+                      painter: _LineChartPainter(data: data, lines: lines),
+                    ),
+                  ),
+                ],
+              );
+            }),
       ),
     );
   }
