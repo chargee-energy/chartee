@@ -72,8 +72,8 @@ class ChartBase extends StatelessWidget {
               ),
           child: data.labels.vertical.customLabels ??
               VerticalLabels(
+                data: data,
                 lines: lines,
-                labels: data.labels.vertical,
               ),
         ),
       Expanded(
