@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+import '../enums/chart_direction.dart';
 import 'chart_grid.dart';
 import 'chart_item.dart';
 import 'chart_labels.dart';
@@ -12,7 +13,13 @@ import 'chart_tooltip.dart';
 /// See also:
 ///
 ///  * [BarChartData], for an implementation used in a bar chart.
+///  * [LineChartData], for an implementation used in a line chart.
 abstract class ChartData<Item extends ChartItem> with EquatableMixin {
+  /// The direction in which the chart should render. `ChartDirection.ltr` will
+  /// render the labels on the left and the chart on the right,`ChartDirection.rtl`
+  /// will render the labels on the right and the chart on the left.
+  final ChartDirection direction;
+
   /// The information that will be used to render the chart grid.
   final ChartGrid grid;
 
@@ -36,6 +43,7 @@ abstract class ChartData<Item extends ChartItem> with EquatableMixin {
   double get maxY;
 
   const ChartData({
+    required this.direction,
     required this.grid,
     required this.labels,
     required this.tooltip,
@@ -44,5 +52,5 @@ abstract class ChartData<Item extends ChartItem> with EquatableMixin {
   });
 
   @override
-  List<Object?> get props => [grid, labels, tooltip, items, padding];
+  List<Object?> get props => [direction, grid, labels, tooltip, items, padding];
 }

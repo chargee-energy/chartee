@@ -1,0 +1,1 @@
+enum ChartDirection { ltr, rtl }

@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 
 import '../models/chart_axis_labels.dart';
 
-/// TODO: Docs
+/// A widget to render the vertical labels of a chart based on the information
+/// provided by a [ChartLabels] object.
 class VerticalLabels extends StatelessWidget {
+  /// The vertical lines that the labels should be aligned with.
   final List<double> lines;
+
+  /// The rendering information for the labels.
   final ChartAxisLabels<double> labels;
 
   const VerticalLabels({super.key, required this.lines, required this.labels});

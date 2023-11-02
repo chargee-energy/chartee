@@ -20,14 +20,26 @@ class ChartAxisLabels<Value extends num> with EquatableMixin {
   /// A function to get the text that should be rendered in a label.
   final String? Function(Value value)? getLabelText;
 
+  /// A way to override the default labels with a custom widget. If this is
+  /// supplied `offset`, `style` and `getLabelText` will be ignored.
+  final Widget? customLabels;
+
   const ChartAxisLabels({
     this.visible = false,
     this.padding = EdgeInsets.zero,
     this.offset = 0,
     this.style,
     this.getLabelText,
+    this.customLabels,
   });
 
   @override
-  List<Object?> get props => [visible, padding, offset, style, getLabelText];
+  List<Object?> get props => [
+        visible,
+        padding,
+        offset,
+        style,
+        getLabelText,
+        customLabels,
+      ];
 }

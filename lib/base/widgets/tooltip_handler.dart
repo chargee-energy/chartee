@@ -37,7 +37,8 @@ class TooltipHandler extends StatelessWidget {
   }
 }
 
-/// TODO: Docs
+/// A widget to handle the positioning of a default tooltip inside a chart. This
+/// tooltip shows and hides based on touch input and moves with the selected index.
 class _DefaultTooltipHandler extends StatefulWidget {
   /// The information that will be used to render the chart tooltip.
   final ChartTooltip tooltip;
@@ -132,7 +133,8 @@ class _DefaultTooltipHandlerState extends State<_DefaultTooltipHandler> {
   }
 }
 
-/// TODO: Docs
+/// A widget to handle the positioning of a sticky tooltip inside a chart. This
+/// tooltip is always visible and will only move it's arrow.
 class _StickyTooltipHandler extends StatefulWidget {
   /// The information that will be used to render the chart tooltip.
   final ChartTooltip tooltip;

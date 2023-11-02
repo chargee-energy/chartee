@@ -9,6 +9,9 @@ class GridLines<Value extends num> extends StatelessWidget {
   /// The axis of the lines (x-axis = horizontal, y-axis = vertical)
   final Axis axis;
 
+  /// The alignment of the lines on the main axis.
+  final MainAxisAlignment mainAxisAlignment;
+
   /// The values of the lines, these will be passed to the [getLine] function.
   final List<Value> values;
 
@@ -18,6 +21,7 @@ class GridLines<Value extends num> extends StatelessWidget {
   const GridLines({
     super.key,
     required this.axis,
+    required this.mainAxisAlignment,
     required this.values,
     required this.getLine,
   });
@@ -26,9 +30,7 @@ class GridLines<Value extends num> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Flex(
       direction: axis,
-      mainAxisAlignment: axis == Axis.vertical
-          ? MainAxisAlignment.spaceBetween
-          : MainAxisAlignment.spaceAround,
+      mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: values.map(
         (value) {

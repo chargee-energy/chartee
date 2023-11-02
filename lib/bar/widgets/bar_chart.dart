@@ -35,6 +35,7 @@ class BarChart extends StatelessWidget {
       ),
       builder: (context, showTooltip, hideTooltip) => ChartBase(
         data: data,
+        xAxisAlignment: XAxisAlignment.spaceAround,
         builder: (context, lines) => BarChartGestureHandler(
           numberOfBars: data.items.length,
           onChange: (centerX, selectedIndex) {
