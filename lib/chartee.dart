@@ -2,6 +2,8 @@ library chartee;
 
 export 'base/enums/chart_direction.dart';
 
+export 'base/utils/text.dart';
+
 export 'base/models/chart_axis_labels.dart';
 export 'base/models/chart_axis_lines.dart';
 export 'base/models/chart_grid.dart';
