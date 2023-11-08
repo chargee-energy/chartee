@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../../base/models/chart_data.dart';
+import 'line_chart_cursor.dart';
 import 'line_chart_item.dart';
 
 /// An implementation of [ChartData] specifically used for a line chart.
@@ -23,6 +24,9 @@ class LineChartData extends ChartData<LineChartItem> {
   /// The width of the line.
   final double lineWidth;
 
+  /// The information that will be used to render the cursor.
+  final LineChartCursor cursor;
+
   @override
   double get minY =>
       min(items.map((item) => item.y).minOrNull ?? 0, 0).abs().toDouble();
@@ -36,6 +40,7 @@ class LineChartData extends ChartData<LineChartItem> {
     required this.colorNegativeLine,
     required this.colorNegativeArea,
     this.lineWidth = 1,
+    this.cursor = const LineChartCursor(),
     required super.direction,
     required super.grid,
     required super.labels,

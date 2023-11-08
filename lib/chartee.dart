@@ -18,6 +18,7 @@ export 'bar/models/bar_chart_item.dart';
 
 export 'bar/widgets/bar_chart.dart';
 
+export 'line/models/line_chart_cursor.dart';
 export 'line/models/line_chart_data.dart';
 export 'line/models/line_chart_item.dart';
 

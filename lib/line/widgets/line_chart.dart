@@ -32,28 +32,44 @@ class LineChart extends StatelessWidget {
         data: data,
         xAxisAlignment: XAxisAlignment.spaceBetween,
         builder: (context, lines) => LineChartGestureHandler(
-            items: data.items,
-            onChange: (centerX, selectedIndex) {
-              if (data.tooltip.shouldShow?.call(selectedIndex) ?? true) {
-                HapticFeedback.selectionClick();
-                showTooltip(centerX, selectedIndex);
-              } else {
-                hideTooltip();
-              }
-            },
-            onReset: hideTooltip,
-            builder: (context, selectedIndex) {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: CustomPaint(
-                      painter: _LineChartPainter(data: data, lines: lines),
+          items: data.items,
+          onChange: (centerX, selectedIndex) {
+            if (data.tooltip.shouldShow?.call(selectedIndex) ?? true) {
+              HapticFeedback.selectionClick();
+              showTooltip(centerX, selectedIndex);
+            } else {
+              hideTooltip();
+            }
+          },
+          onReset: hideTooltip,
+          builder: (context, selectedIndex) {
+            final minY = lines.min.abs();
+            final maxY = lines.max;
+            final centerFraction = maxY / (minY + maxY);
+
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _LineChartPainter(
+                      data: data,
+                      minY: minY,
+                      maxY: maxY,
+                      centerFraction: centerFraction,
                     ),
                   ),
-                ],
-              );
-            }),
+                ),
+                _LineChartCursor(
+                  data: data,
+                  minY: minY,
+                  maxY: maxY,
+                  centerFraction: centerFraction,
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -63,8 +79,14 @@ class _LineChartPainter extends CustomPainter {
   /// The data that will be rendered in the chart.
   final LineChartData data;
 
-  /// The vertical lines of the chart.
-  final List<double> lines;
+  /// The lowest y value.
+  final double minY;
+
+  /// The highest y value.
+  final double maxY;
+
+  /// The center fraction between the lowest and highest y values.
+  final double centerFraction;
 
   late final _linePaint = Paint()
     ..style = PaintingStyle.stroke
@@ -72,11 +94,19 @@ class _LineChartPainter extends CustomPainter {
 
   final _areaPaint = Paint()..style = PaintingStyle.fill;
 
-  _LineChartPainter({required this.data, required this.lines});
+  _LineChartPainter({
+    required this.data,
+    required this.minY,
+    required this.maxY,
+    required this.centerFraction,
+  });
 
   @override
   bool shouldRepaint(covariant _LineChartPainter oldPainter) {
-    return oldPainter.data != data || oldPainter.lines != lines;
+    return oldPainter.data != data ||
+        oldPainter.minY != minY ||
+        oldPainter.maxY != maxY ||
+        oldPainter.centerFraction != centerFraction;
   }
 
   @override
@@ -84,10 +114,6 @@ class _LineChartPainter extends CustomPainter {
     if (data.items.isEmpty || data.items.none((item) => item.y != 0)) {
       return;
     }
-
-    final minY = lines.min.abs();
-    final maxY = lines.max;
-    final centerFraction = maxY / (minY + maxY);
 
     final topHeight = centerFraction * size.height - 1;
     final firstItem = data.items.first;
@@ -121,19 +147,62 @@ class _LineChartPainter extends CustomPainter {
     canvas.drawPath(areaPath, _areaPaint..color = data.colorNegativeArea);
     canvas.restore();
   }
+}
 
-  double _getPointYFraction(
-    LineChartItem item,
-    double maxY,
-    double minY,
-    double centerFraction,
-  ) {
-    if (item.y > 0) {
-      return (maxY - item.y) / (maxY + minY);
-    } else if (item.y < 0) {
-      return (maxY - item.y) / (maxY + minY);
+double _getPointYFraction(
+  LineChartItem item,
+  double maxY,
+  double minY,
+  double centerFraction,
+) {
+  if (item.y > 0) {
+    return (maxY - item.y) / (maxY + minY);
+  } else if (item.y < 0) {
+    return (maxY - item.y) / (maxY + minY);
+  }
+
+  return centerFraction;
+}
+
+class _LineChartCursor extends StatelessWidget {
+  /// The data that will be rendered in the chart.
+  final LineChartData data;
+
+  /// The lowest y value.
+  final double minY;
+
+  /// The highest y value.
+  final double maxY;
+
+  /// The center fraction between the lowest and highest y values.
+  final double centerFraction;
+
+  const _LineChartCursor({
+    required this.data,
+    required this.minY,
+    required this.maxY,
+    required this.centerFraction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cursorBuilder = data.cursor.getCursor;
+
+    if (data.cursor.visible && cursorBuilder != null && data.items.isNotEmpty) {
+      final cursorX = data.items.last.xPercentage;
+      final cursorY =
+          _getPointYFraction(data.items.last, maxY, minY, centerFraction);
+
+      return AnimatedAlign(
+        alignment: FractionalOffset(cursorX, cursorY),
+        duration: data.cursor.animationDuration,
+        child: FractionalTranslation(
+          translation: Offset(0.5, cursorY - 0.5),
+          child: cursorBuilder(data.items.last.y >= 0),
+        ),
+      );
     }
 
-    return centerFraction;
+    return Container();
   }
 }
