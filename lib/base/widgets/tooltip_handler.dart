@@ -52,7 +52,6 @@ class _DefaultTooltipHandler extends StatefulWidget {
   ) builder;
 
   const _DefaultTooltipHandler({
-    super.key,
     required this.tooltip,
     required this.builder,
   });
@@ -148,7 +147,6 @@ class _StickyTooltipHandler extends StatefulWidget {
   ) builder;
 
   const _StickyTooltipHandler({
-    super.key,
     required this.tooltip,
     required this.builder,
   });
@@ -168,6 +166,10 @@ class _StickyTooltipHandlerState extends State<_StickyTooltipHandler> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+
       final ownBox = context.findRenderObject() as RenderBox;
       final tooltipBox =
           _tooltipKey.currentContext?.findRenderObject() as RenderBox;
