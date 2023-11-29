@@ -43,7 +43,7 @@ double _getRoundedBaseValue(double maxY) {
 /// Get rounded values to show the lines in the chart
 List<double> getLineValues(double minY, double maxY) {
   if (minY == 0 && maxY == 0) {
-    return [0];
+    return [0, 1];
   }
 
   final baseValue = _getRoundedBaseValue(max(maxY, minY));
