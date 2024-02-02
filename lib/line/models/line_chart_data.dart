@@ -27,12 +27,20 @@ class LineChartData extends ChartData<LineChartItem> {
   /// The information that will be used to render the cursor.
   final LineChartCursor cursor;
 
-  @override
-  double get minY =>
-      min(items.map((item) => item.y).minOrNull ?? 0, 0).abs().toDouble();
+  /// Whether to draw the area covered by the line or only the line itself.
+  final bool drawArea;
 
   @override
-  double get maxY => max(items.map((item) => item.y).maxOrNull ?? 0, 0);
+  double get minY {
+    final minY = items.map((item) => item.y).minOrNull ?? 0;
+    return useZeroBase ? min(minY, 0.0) : minY;
+  }
+
+  @override
+  double get maxY {
+    final maxY = items.map((item) => item.y).maxOrNull ?? 0;
+    return useZeroBase ? max(maxY, 0.0) : maxY;
+  }
 
   const LineChartData({
     required this.colorPositiveLine,
@@ -41,11 +49,13 @@ class LineChartData extends ChartData<LineChartItem> {
     required this.colorNegativeArea,
     this.lineWidth = 1,
     this.cursor = const LineChartCursor(),
+    this.drawArea = true,
     required super.direction,
     required super.grid,
     required super.labels,
     required super.tooltip,
     required super.items,
+    super.useZeroBase = true,
     super.padding,
   });
 

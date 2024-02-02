@@ -38,7 +38,7 @@ class ChartBase extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lines = getLineValues(data.minY, data.maxY);
+    final lines = getLineValues(data.minY, data.maxY, data.useZeroBase);
     final horizontalLabelsSize =
         calculateTextSize('0', data.labels.horizontal.style);
     final verticalLabelsSize =

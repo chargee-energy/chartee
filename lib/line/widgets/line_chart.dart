@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,7 +8,6 @@ import '../../base/utils/text.dart';
 import '../../base/widgets/chart_base.dart';
 import '../../base/widgets/tooltip_handler.dart';
 import '../models/line_chart_data.dart';
-import '../models/line_chart_item.dart';
 import 'line_chart_gesture_handler.dart';
 
 /// A widget to render a line chart. Uses [ChartBase] to render the basic
@@ -42,33 +43,21 @@ class LineChart extends StatelessWidget {
             }
           },
           onReset: hideTooltip,
-          builder: (context, selectedIndex) {
-            final minY = lines.min.abs();
-            final maxY = lines.max;
-            final centerFraction = maxY / (minY + maxY);
-
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: _LineChartPainter(
-                      data: data,
-                      minY: minY,
-                      maxY: maxY,
-                      centerFraction: centerFraction,
-                    ),
+          builder: (context, selectedIndex) => Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _LineChartPainter(
+                    data: data,
+                    minY: lines.min,
+                    maxY: lines.max,
                   ),
                 ),
-                _LineChartCursor(
-                  data: data,
-                  minY: minY,
-                  maxY: maxY,
-                  centerFraction: centerFraction,
-                ),
-              ],
-            );
-          },
+              ),
+              _LineChartCursor(data: data, minY: lines.min, maxY: lines.max),
+            ],
+          ),
         ),
       ),
     );
@@ -85,9 +74,6 @@ class _LineChartPainter extends CustomPainter {
   /// The highest y value.
   final double maxY;
 
-  /// The center fraction between the lowest and highest y values.
-  final double centerFraction;
-
   late final _linePaint = Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = data.lineWidth;
@@ -98,15 +84,13 @@ class _LineChartPainter extends CustomPainter {
     required this.data,
     required this.minY,
     required this.maxY,
-    required this.centerFraction,
   });
 
   @override
   bool shouldRepaint(covariant _LineChartPainter oldPainter) {
     return oldPainter.data != data ||
         oldPainter.minY != minY ||
-        oldPainter.maxY != maxY ||
-        oldPainter.centerFraction != centerFraction;
+        oldPainter.maxY != maxY;
   }
 
   @override
@@ -115,10 +99,10 @@ class _LineChartPainter extends CustomPainter {
       return;
     }
 
-    final topHeight = centerFraction * size.height - 1;
+    final center = _getBoundValue(0, maxY, minY);
+    final topHeight = _getFraction(center, maxY, minY) * size.height - 1;
     final firstItem = data.items.first;
-    final firstY =
-        _getPointYFraction(firstItem, maxY, minY, centerFraction) * size.height;
+    final firstY = _getFraction(firstItem.y, maxY, minY) * size.height;
 
     final linePath = Path()..moveTo(firstItem.xPercentage * size.width, firstY);
     final areaPath = Path()
@@ -127,8 +111,7 @@ class _LineChartPainter extends CustomPainter {
 
     for (var index = 1; index < data.items.length; index++) {
       final item = data.items[index];
-      final y =
-          _getPointYFraction(item, maxY, minY, centerFraction) * size.height;
+      final y = _getFraction(item.y, maxY, minY) * size.height;
       linePath.lineTo(item.xPercentage * size.width, y);
       areaPath.lineTo(item.xPercentage * size.width, y);
     }
@@ -138,30 +121,19 @@ class _LineChartPainter extends CustomPainter {
     canvas.save();
     canvas.clipRect(Rect.fromLTRB(0, 0, size.width, topHeight));
     canvas.drawPath(linePath, _linePaint..color = data.colorPositiveLine);
-    canvas.drawPath(areaPath, _areaPaint..color = data.colorPositiveArea);
+    if (data.drawArea) {
+      canvas.drawPath(areaPath, _areaPaint..color = data.colorPositiveArea);
+    }
     canvas.restore();
 
     canvas.save();
     canvas.clipRect(Rect.fromLTRB(0, topHeight, size.width, size.height));
     canvas.drawPath(linePath, _linePaint..color = data.colorNegativeLine);
-    canvas.drawPath(areaPath, _areaPaint..color = data.colorNegativeArea);
+    if (data.drawArea) {
+      canvas.drawPath(areaPath, _areaPaint..color = data.colorNegativeArea);
+    }
     canvas.restore();
   }
-}
-
-double _getPointYFraction(
-  LineChartItem item,
-  double maxY,
-  double minY,
-  double centerFraction,
-) {
-  if (item.y > 0) {
-    return (maxY - item.y) / (maxY + minY);
-  } else if (item.y < 0) {
-    return (maxY - item.y) / (maxY + minY);
-  }
-
-  return centerFraction;
 }
 
 class _LineChartCursor extends StatelessWidget {
@@ -174,14 +146,10 @@ class _LineChartCursor extends StatelessWidget {
   /// The highest y value.
   final double maxY;
 
-  /// The center fraction between the lowest and highest y values.
-  final double centerFraction;
-
   const _LineChartCursor({
     required this.data,
     required this.minY,
     required this.maxY,
-    required this.centerFraction,
   });
 
   @override
@@ -190,8 +158,7 @@ class _LineChartCursor extends StatelessWidget {
 
     if (data.cursor.visible && cursorBuilder != null && data.items.isNotEmpty) {
       final cursorX = data.items.last.xPercentage;
-      final cursorY =
-          _getPointYFraction(data.items.last, maxY, minY, centerFraction);
+      final cursorY = _getFraction(data.items.last.y, maxY, minY);
 
       return AnimatedAlign(
         alignment: FractionalOffset(cursorX, cursorY),
@@ -205,4 +172,14 @@ class _LineChartCursor extends StatelessWidget {
 
     return Container();
   }
+}
+
+/// Get the supplied value position within the supplied bounds.
+double _getBoundValue(double value, double maxValue, double minValue) {
+  return min(max(value, minValue), maxValue);
+}
+
+/// Get the fraction of the supplied value position within the supplied bounds.
+double _getFraction(double value, double maxValue, double minValue) {
+  return 1.0 - ((value - minValue) / (maxValue - minValue));
 }

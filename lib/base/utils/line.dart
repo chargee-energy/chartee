@@ -41,24 +41,33 @@ double _getRoundedBaseValue(double maxY) {
 }
 
 /// Get rounded values to show the lines in the chart
-List<double> getLineValues(double minY, double maxY) {
+List<double> getLineValues(double minY, double maxY, bool useZeroBase) {
   if (minY == 0 && maxY == 0) {
     return [0, 1];
   }
 
-  final baseValue = _getRoundedBaseValue(max(maxY, minY));
+  final absMinY = minY.abs();
+  final baseValue = _getRoundedBaseValue(max(maxY, absMinY));
 
-  final positiveLineCount = (maxY / baseValue).ceil();
+  final positiveLineCount = maxY > 0 ? (maxY / baseValue).ceil() : 0;
   final positiveLines = List.generate(
     positiveLineCount,
     (index) => baseValue * (index + 1),
   );
 
-  final negativeLineCount = (minY / baseValue).ceil();
+  final negativeLineCount = minY < 0 ? (absMinY / baseValue).ceil() : 0;
   final negativeLines = List.generate(
     negativeLineCount,
     (index) => -baseValue * (index + 1),
-  );
+  ).reversed.toList();
 
-  return [...negativeLines.reversed, 0, ...positiveLines];
+  if (!useZeroBase && negativeLines.isEmpty) {
+    return positiveLines;
+  }
+
+  if (!useZeroBase && positiveLines.isEmpty) {
+    return negativeLines;
+  }
+
+  return [...negativeLines, 0, ...positiveLines];
 }

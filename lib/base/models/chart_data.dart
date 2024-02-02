@@ -32,6 +32,9 @@ abstract class ChartData<Item extends ChartItem> with EquatableMixin {
   /// The items that will be plotted to the chart.
   final List<Item> items;
 
+  /// Whether the graph will show `0` as base or it will scale to it's values only.
+  final bool useZeroBase;
+
   /// Padding to apply around the chart.
   final EdgeInsets padding;
 
@@ -48,6 +51,7 @@ abstract class ChartData<Item extends ChartItem> with EquatableMixin {
     required this.labels,
     required this.tooltip,
     required this.items,
+    this.useZeroBase = true,
     this.padding = EdgeInsets.zero,
   });
 
