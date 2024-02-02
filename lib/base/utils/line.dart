@@ -62,11 +62,11 @@ List<double> getLineValues(double minY, double maxY, bool useZeroBase) {
   ).reversed.toList();
 
   if (!useZeroBase && negativeLines.isEmpty) {
-    return positiveLines;
+    return [if (minY < baseValue) 0, ...positiveLines];
   }
 
   if (!useZeroBase && positiveLines.isEmpty) {
-    return negativeLines;
+    return [...negativeLines, if (maxY > -baseValue) 0];
   }
 
   return [...negativeLines, 0, ...positiveLines];
