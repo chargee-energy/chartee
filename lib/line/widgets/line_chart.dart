@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -176,7 +174,7 @@ class _LineChartCursor extends StatelessWidget {
 
 /// Get the supplied value position within the supplied bounds.
 double _getBoundValue(double value, double maxValue, double minValue) {
-  return min(max(value, minValue), maxValue);
+  return value.clamp(minValue, maxValue);
 }
 
 /// Get the fraction of the supplied value position within the supplied bounds.
