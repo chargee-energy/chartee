@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../models/chart_bounds.dart';
 import '../models/chart_layer.dart';
-import '../visitors/widget_chart_layer_visitor.dart';
+import 'chart_line.dart';
 
 class Chart extends StatelessWidget {
   final List<ChartLayer> layers;
@@ -10,6 +11,18 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WidgetChartLayerVisitor().build(context, layers);
+    final bounds = ChartBounds.merge(layers.map((layer) => layer.bounds));
+    return Stack(
+      fit: StackFit.expand,
+      children: layers
+          .map(
+            (layer) => switch (layer) {
+              ChartGridLayer() => Container(),
+              ChartLineLayer() => ChartLine(bounds: bounds, layer: layer),
+              ChartBarLayer() => Container(),
+            },
+          )
+          .toList(),
+    );
   }
 }

@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../models/chart_bounds.dart';
-import '../models/chart_line_layer.dart';
+import '../models/chart_layer.dart';
 import '../models/chart_point.dart';
 
 class ChartLine extends StatelessWidget {
