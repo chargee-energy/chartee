@@ -8,4 +8,7 @@ class ChartPoint extends ChartItem {
   ChartBounds get bounds => ChartBounds(minY: y, maxY: y, minX: x, maxX: x);
 
   const ChartPoint({required super.x, required this.y});
+
+  @override
+  List<Object?> get props => [...super.props, y];
 }

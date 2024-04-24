@@ -2,17 +2,16 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../models/chart_bounds.dart';
-import '../models/chart_layer.dart';
 import '../models/chart_point.dart';
 
 class ChartLine extends StatelessWidget {
   final ChartBounds bounds;
-  final ChartLineLayer layer;
+  final List<ChartPoint> items;
 
   const ChartLine({
     super.key,
     required this.bounds,
-    required this.layer,
+    required this.items,
   });
 
   @override
@@ -20,7 +19,7 @@ class ChartLine extends StatelessWidget {
     return CustomPaint(
       painter: _ChartLinePainter(
         bounds: bounds,
-        points: layer.items,
+        points: items,
       ),
     );
   }
@@ -38,6 +37,7 @@ class _ChartLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // TODO: Implement colors, area etc.
     if (points.isEmpty || points.none((point) => point.y != 0)) {
       return;
     }

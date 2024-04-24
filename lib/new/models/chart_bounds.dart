@@ -1,6 +1,8 @@
 import 'dart:math';
 
-class ChartBounds {
+import 'package:equatable/equatable.dart';
+
+class ChartBounds with EquatableMixin {
   final double? minY;
   final double? maxY;
   final double? minX;
@@ -58,4 +60,7 @@ class ChartBounds {
     if (a == null && b != null) return b;
     return null;
   }
+
+  @override
+  List<Object?> get props => [minY, maxY, minX, maxX];
 }
