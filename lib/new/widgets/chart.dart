@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/chart_bounds.dart';
 import '../models/chart_layer.dart';
+import 'chart_bars.dart';
 import 'chart_grid.dart';
 import 'chart_line.dart';
 
@@ -29,7 +30,8 @@ class Chart extends StatelessWidget {
                 ),
               ChartLineLayer(:final items) =>
                 ChartLine(bounds: bounds, items: items),
-              ChartBarLayer() => Container(),
+              ChartBarLayer(:final items) =>
+                ChartBars(bounds: bounds, items: items),
             },
           )
           .toList(),

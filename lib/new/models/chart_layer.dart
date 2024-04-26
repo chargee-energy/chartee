@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import 'bar_stack.dart';
 import 'chart_bounds.dart';
 import 'chart_item.dart';
 import 'chart_point.dart';
@@ -87,7 +88,7 @@ sealed class ChartItemLayer<Item extends ChartItem> extends ChartLayer {
   List<Object?> get props => [...super.props, items];
 }
 
-class ChartBarLayer extends ChartItemLayer<ChartItem> {
+class ChartBarLayer extends ChartItemLayer<BarStack> {
   const ChartBarLayer({
     required super.items,
     super.extendBehindLeadingLabels,

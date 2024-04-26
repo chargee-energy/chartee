@@ -8,16 +8,12 @@ class ChartLine extends StatelessWidget {
   final ChartBounds bounds;
   final List<ChartPoint> items;
 
-  const ChartLine({
-    super.key,
-    required this.bounds,
-    required this.items,
-  });
+  const ChartLine({super.key, required this.bounds, required this.items});
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: _ChartLinePainter(
+      painter: _LinePainter(
         bounds: bounds,
         points: items,
       ),
@@ -25,19 +21,20 @@ class ChartLine extends StatelessWidget {
   }
 }
 
-class _ChartLinePainter extends CustomPainter {
+class _LinePainter extends CustomPainter {
   final ChartBounds bounds;
   final List<ChartPoint> points;
 
-  const _ChartLinePainter({required this.bounds, required this.points});
+  const _LinePainter({required this.bounds, required this.points});
 
   @override
-  bool shouldRepaint(covariant _ChartLinePainter oldDelegate) =>
+  bool shouldRepaint(covariant _LinePainter oldDelegate) =>
       bounds != oldDelegate.bounds || points != oldDelegate.points;
 
   @override
   void paint(Canvas canvas, Size size) {
     // TODO: Implement colors, area etc.
+    // TODO: Instantiate paint on top level
     if (points.isEmpty || points.none((point) => point.y != 0)) {
       return;
     }
@@ -61,6 +58,6 @@ class _ChartLinePainter extends CustomPainter {
 
   Offset _getOffset(ChartPoint point, Size size) => Offset(
         bounds.getFractionX(point.x) * size.width,
-        bounds.getFractionY(point.y) * size.height,
+        (1 - bounds.getFractionY(point.y)) * size.height,
       );
 }
