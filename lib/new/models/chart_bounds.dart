@@ -26,6 +26,7 @@ class ChartBounds with EquatableMixin {
         (combined, bounds) => combined.mergeWith(bounds),
       );
 
+  // TODO: Check unbounded
   double getFractionX(double x) {
     if (this case ChartBounds(:final minX?, :final maxX?)) {
       return (x - minX) / (maxX - minX);
@@ -33,9 +34,10 @@ class ChartBounds with EquatableMixin {
     return x;
   }
 
+  // TODO: Check unbounded
   double getFractionY(double y) {
     if (this case ChartBounds(:final minY?, :final maxY?)) {
-      return (y - minY) / (maxY - minY);
+      return 1 - (y - minY) / (maxY - minY);
     }
     return y;
   }

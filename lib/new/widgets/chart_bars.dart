@@ -6,15 +6,15 @@ import '../models/chart_bounds.dart';
 
 class ChartBars extends StatelessWidget {
   final ChartBounds bounds;
-  final List<BarStack> items;
+  final List<BarStack> barStacks;
 
-  const ChartBars({super.key, required this.bounds, required this.items});
+  const ChartBars({super.key, required this.bounds, required this.barStacks});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       fit: StackFit.expand,
-      children: items
+      children: barStacks
           .map(
             (barStack) => CustomPaint(
               painter: _BarStackPainter(
@@ -57,8 +57,8 @@ class _BarStackPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final centerX = bounds.getFractionX(barStack.x) * size.width;
-    final top = (1 - bounds.getFractionY(barStack.minY)) * size.height;
-    final bottom = (1 - bounds.getFractionY(barStack.maxY)) * size.height;
+    final top = bounds.getFractionY(barStack.minY) * size.height;
+    final bottom = bounds.getFractionY(barStack.maxY) * size.height;
 
     final clipRect = Rect.fromLTRB(
       centerX - barStack.width / 2,
@@ -112,8 +112,8 @@ class _BarPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final top = (1 - bounds.getFractionY(bar.minValue)) * size.height;
-    final bottom = (1 - bounds.getFractionY(bar.maxValue)) * size.height;
+    final top = bounds.getFractionY(bar.minValue) * size.height;
+    final bottom = bounds.getFractionY(bar.maxValue) * size.height;
     final width = bar.width ?? size.width;
     final left = (size.width - width) / 2;
 

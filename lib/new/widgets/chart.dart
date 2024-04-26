@@ -28,10 +28,23 @@ class Chart extends StatelessWidget {
                   horizontalLineBuilder: horizontalLineBuilder,
                   verticalLineBuilder: verticalLineBuilder,
                 ),
-              ChartLineLayer(:final items) =>
-                ChartLine(bounds: bounds, items: items),
+              ChartLineLayer(
+                :final items,
+                :final positiveColor,
+                :final negativeColor,
+                :final lineWidth,
+              ) =>
+                ChartLine(
+                  bounds: bounds,
+                  points: items,
+                  positiveColor: positiveColor,
+                  negativeColor: negativeColor,
+                  lineWidth: lineWidth,
+                ),
+              ChartAreaLayer(:final items) =>
+                Container(), // TODO: Implement area layer
               ChartBarLayer(:final items) =>
-                ChartBars(bounds: bounds, items: items),
+                ChartBars(bounds: bounds, barStacks: items),
             },
           )
           .toList(),

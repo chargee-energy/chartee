@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:equatable/equatable.dart';
 
 import 'bar_stack.dart';
@@ -99,11 +101,44 @@ class ChartBarLayer extends ChartItemLayer<BarStack> {
 }
 
 class ChartLineLayer extends ChartItemLayer<ChartPoint> {
+  final Color positiveColor;
+  final Color negativeColor;
+  final double lineWidth;
+
   const ChartLineLayer({
     required super.items,
+    required this.positiveColor,
+    required this.negativeColor,
+    this.lineWidth = 1,
     super.extendBehindLeadingLabels,
     super.extendBehindTrailingLabels,
     super.extendBehindTopLabels,
     super.extendBehindBottomLabels,
   });
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        positiveColor,
+        negativeColor,
+        lineWidth,
+      ];
+}
+
+class ChartAreaLayer extends ChartItemLayer<ChartPoint> {
+  final Color positiveColor;
+  final Color negativeColor;
+
+  const ChartAreaLayer({
+    required super.items,
+    required this.positiveColor,
+    required this.negativeColor,
+    super.extendBehindLeadingLabels,
+    super.extendBehindTrailingLabels,
+    super.extendBehindTopLabels,
+    super.extendBehindBottomLabels,
+  });
+
+  @override
+  List<Object?> get props => [...super.props, positiveColor, negativeColor];
 }
