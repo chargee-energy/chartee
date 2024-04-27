@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/chart_bounds.dart';
 import '../models/chart_layer.dart';
+import 'chart_area.dart';
 import 'chart_bars.dart';
 import 'chart_grid.dart';
 import 'chart_line.dart';
@@ -41,8 +42,17 @@ class Chart extends StatelessWidget {
                   negativeColor: negativeColor,
                   lineWidth: lineWidth,
                 ),
-              ChartAreaLayer(:final items) =>
-                Container(), // TODO: Implement area layer
+              ChartAreaLayer(
+                :final items,
+                :final positiveColor,
+                :final negativeColor,
+              ) =>
+                ChartArea(
+                  bounds: bounds,
+                  points: items,
+                  positiveColor: positiveColor,
+                  negativeColor: negativeColor,
+                ),
               ChartBarLayer(:final items) =>
                 ChartBars(bounds: bounds, barStacks: items),
             },

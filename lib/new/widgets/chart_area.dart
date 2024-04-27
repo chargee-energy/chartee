@@ -4,68 +4,55 @@ import '../models/chart_bounds.dart';
 import '../models/chart_point.dart';
 import 'chart_path_painter.dart';
 
-class ChartLine extends StatelessWidget {
+class ChartArea extends StatelessWidget {
   final ChartBounds bounds;
   final List<ChartPoint> points;
   final Color positiveColor;
   final Color negativeColor;
-  final double lineWidth;
 
-  const ChartLine({
+  const ChartArea({
     super.key,
     required this.bounds,
     required this.points,
     required this.positiveColor,
     required this.negativeColor,
-    required this.lineWidth,
   });
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: _LinePainter(
+      painter: _AreaPainter(
         bounds: bounds,
         points: points,
         positiveColor: positiveColor,
         negativeColor: negativeColor,
-        lineWidth: lineWidth,
       ),
     );
   }
 }
 
-class _LinePainter extends CustomPainter {
+class _AreaPainter extends CustomPainter {
   final ChartBounds bounds;
   final List<ChartPoint> points;
   final Color positiveColor;
   final Color negativeColor;
-  final double lineWidth;
 
-  late final _positivePaint = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = lineWidth
-    ..color = positiveColor;
+  late final _positivePaint = Paint()..color = positiveColor;
+  late final _negativePaint = Paint()..color = negativeColor;
 
-  late final _negativePaint = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = lineWidth
-    ..color = negativeColor;
-
-  _LinePainter({
+  _AreaPainter({
     required this.bounds,
     required this.points,
     required this.positiveColor,
     required this.negativeColor,
-    required this.lineWidth,
   });
 
   @override
-  bool shouldRepaint(covariant _LinePainter oldDelegate) =>
+  bool shouldRepaint(covariant _AreaPainter oldDelegate) =>
       bounds != oldDelegate.bounds ||
       points != oldDelegate.points ||
       positiveColor != oldDelegate.positiveColor ||
-      negativeColor != oldDelegate.negativeColor ||
-      lineWidth != oldDelegate.lineWidth;
+      negativeColor != oldDelegate.negativeColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -76,6 +63,7 @@ class _LinePainter extends CustomPainter {
       points,
       _positivePaint,
       _negativePaint,
+      closePath: true,
     );
   }
 }
