@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 class GridLine with EquatableMixin {
   final Color color;
   final double width;
-  final List<int>? dashArray;
+  final List<double>? dashArray;
 
   const GridLine({required this.color, this.width = 1, this.dashArray});
 
@@ -13,4 +13,4 @@ class GridLine with EquatableMixin {
   List<Object?> get props => [color, width, dashArray];
 }
 
-typedef GridLineBuilder = GridLine? Function(int index);
+typedef GridLineBuilder = GridLine? Function(int index, double value);

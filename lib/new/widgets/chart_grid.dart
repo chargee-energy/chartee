@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/chart_bounds.dart';
 import '../models/grid_line.dart';
+import '../utils/path.dart';
 
 class ChartGrid extends StatelessWidget {
   final ChartBounds bounds;
@@ -81,13 +82,22 @@ class _GridLinesPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // TODO: Multiple lines, dashed lines, axis etc.
     for (var i = 0; i < 2; i++) {
-      final line = lineBuilder(i);
+      final line = lineBuilder(i, 0);
       if (line != null) {
-        final paint = Paint()..color = line.color;
-        canvas.drawRect(
-          Rect.fromLTWH(0, size.height * i, size.width, line.width),
-          paint,
-        );
+        final paint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = line.width
+          ..color = line.color;
+
+        var path = Path()
+          ..moveTo(0, size.height * i)
+          ..lineTo(size.width, size.height * i);
+
+        if (line.dashArray case final dashArray?) {
+          path = createDashedPath(path, dashArray);
+        }
+
+        canvas.drawPath(path, paint);
       }
     }
   }

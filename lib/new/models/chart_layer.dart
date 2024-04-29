@@ -104,12 +104,14 @@ class ChartLineLayer extends ChartItemLayer<ChartPoint> {
   final Color positiveColor;
   final Color negativeColor;
   final double lineWidth;
+  final List<double>? dashArray;
 
   const ChartLineLayer({
     required super.items,
     required this.positiveColor,
     required this.negativeColor,
     this.lineWidth = 1,
+    this.dashArray,
     super.extendBehindLeadingLabels,
     super.extendBehindTrailingLabels,
     super.extendBehindTopLabels,

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../models/chart_bounds.dart';
 import '../models/chart_point.dart';
-import 'chart_path_painter.dart';
+import '../utils/paint.dart';
+import '../utils/path.dart';
 
 class ChartArea extends StatelessWidget {
   final ChartBounds bounds;
@@ -56,14 +57,22 @@ class _AreaPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    ChartPathPainter.paintChartPath(
-      canvas,
+    final path = createPathFromChartPoints(
       size,
       bounds,
       points,
-      _positivePaint,
-      _negativePaint,
       closePath: true,
     );
+
+    if (path != null) {
+      paintChartPath(
+        canvas,
+        size,
+        bounds,
+        path,
+        _positivePaint,
+        _negativePaint,
+      );
+    }
   }
 }

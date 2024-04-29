@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../models/chart_bounds.dart';
 import '../models/chart_point.dart';
-import 'chart_path_painter.dart';
+import '../utils/paint.dart';
+import '../utils/path.dart';
 
 class ChartLine extends StatelessWidget {
   final ChartBounds bounds;
@@ -10,6 +11,7 @@ class ChartLine extends StatelessWidget {
   final Color positiveColor;
   final Color negativeColor;
   final double lineWidth;
+  final List<double>? dashArray;
 
   const ChartLine({
     super.key,
@@ -18,6 +20,7 @@ class ChartLine extends StatelessWidget {
     required this.positiveColor,
     required this.negativeColor,
     required this.lineWidth,
+    required this.dashArray,
   });
 
   @override
@@ -29,6 +32,7 @@ class ChartLine extends StatelessWidget {
         positiveColor: positiveColor,
         negativeColor: negativeColor,
         lineWidth: lineWidth,
+        dashArray: dashArray,
       ),
     );
   }
@@ -40,6 +44,7 @@ class _LinePainter extends CustomPainter {
   final Color positiveColor;
   final Color negativeColor;
   final double lineWidth;
+  final List<double>? dashArray;
 
   late final _positivePaint = Paint()
     ..style = PaintingStyle.stroke
@@ -57,6 +62,7 @@ class _LinePainter extends CustomPainter {
     required this.positiveColor,
     required this.negativeColor,
     required this.lineWidth,
+    required this.dashArray,
   });
 
   @override
@@ -65,17 +71,26 @@ class _LinePainter extends CustomPainter {
       points != oldDelegate.points ||
       positiveColor != oldDelegate.positiveColor ||
       negativeColor != oldDelegate.negativeColor ||
-      lineWidth != oldDelegate.lineWidth;
+      lineWidth != oldDelegate.lineWidth ||
+      dashArray != oldDelegate.dashArray;
 
   @override
   void paint(Canvas canvas, Size size) {
-    ChartPathPainter.paintChartPath(
-      canvas,
-      size,
-      bounds,
-      points,
-      _positivePaint,
-      _negativePaint,
-    );
+    var path = createPathFromChartPoints(size, bounds, points);
+
+    if (path != null) {
+      if (dashArray case final dashArray?) {
+        path = createDashedPath(path, dashArray);
+      }
+
+      paintChartPath(
+        canvas,
+        size,
+        bounds,
+        path,
+        _positivePaint,
+        _negativePaint,
+      );
+    }
   }
 }

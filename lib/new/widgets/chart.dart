@@ -34,6 +34,7 @@ class Chart extends StatelessWidget {
                 :final positiveColor,
                 :final negativeColor,
                 :final lineWidth,
+                :final dashArray,
               ) =>
                 ChartLine(
                   bounds: bounds,
@@ -41,6 +42,7 @@ class Chart extends StatelessWidget {
                   positiveColor: positiveColor,
                   negativeColor: negativeColor,
                   lineWidth: lineWidth,
+                  dashArray: dashArray,
                 ),
               ChartAreaLayer(
                 :final items,
