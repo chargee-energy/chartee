@@ -78,33 +78,27 @@ sealed class ChartItemLayer<Item extends ChartItem> extends ChartLayer {
   @override
   ChartBounds get bounds => ChartBounds.merge(items.map((item) => item.bounds));
 
-  const ChartItemLayer({
-    required this.items,
-    super.extendBehindLeadingLabels,
-    super.extendBehindTrailingLabels,
-    super.extendBehindTopLabels,
-    super.extendBehindBottomLabels,
-  });
+  const ChartItemLayer({required this.items})
+      : super(
+          extendBehindLeadingLabels: false,
+          extendBehindTrailingLabels: false,
+          extendBehindTopLabels: false,
+          extendBehindBottomLabels: false,
+        );
 
   @override
   List<Object?> get props => [...super.props, items];
 }
 
 class ChartBarLayer extends ChartItemLayer<BarStack> {
-  const ChartBarLayer({
-    required super.items,
-    super.extendBehindLeadingLabels,
-    super.extendBehindTrailingLabels,
-    super.extendBehindTopLabels,
-    super.extendBehindBottomLabels,
-  });
+  const ChartBarLayer({required super.items});
 }
 
 class ChartLineLayer extends ChartItemLayer<ChartPoint> {
   final Color positiveColor;
   final Color negativeColor;
   final double lineWidth;
-  final List<double>? dashArray;
+  final List<num>? dashArray;
 
   const ChartLineLayer({
     required super.items,
@@ -112,10 +106,6 @@ class ChartLineLayer extends ChartItemLayer<ChartPoint> {
     required this.negativeColor,
     this.lineWidth = 1,
     this.dashArray,
-    super.extendBehindLeadingLabels,
-    super.extendBehindTrailingLabels,
-    super.extendBehindTopLabels,
-    super.extendBehindBottomLabels,
   });
 
   @override
@@ -135,10 +125,6 @@ class ChartAreaLayer extends ChartItemLayer<ChartPoint> {
     required super.items,
     required this.positiveColor,
     required this.negativeColor,
-    super.extendBehindLeadingLabels,
-    super.extendBehindTrailingLabels,
-    super.extendBehindTopLabels,
-    super.extendBehindBottomLabels,
   });
 
   @override

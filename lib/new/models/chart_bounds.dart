@@ -2,17 +2,33 @@ import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 
+import 'chart_intervals.dart';
+
+// TODO: Use num over double, maybe also Iterable over List?
 class ChartBounds with EquatableMixin {
-  final double? minY;
-  final double? maxY;
   final double? minX;
   final double? maxX;
+  final double? minY;
+  final double? maxY;
+
+  // TODO: Exception if unbounded?
+  List<num> get intervals {
+    if (this case ChartBounds(:final minY?, :final maxY?)) {
+      final intervals = ChartIntervals(minValue: minY, maxValue: maxY);
+      return intervals.values
+          .where((value) => value >= minY && value <= maxY)
+          .toList();
+    }
+
+    // TODO: Custom exception. Can't get intervals of unbounded
+    throw Error();
+  }
 
   const ChartBounds({
-    required this.minY,
-    required this.maxY,
     required this.minX,
     required this.maxX,
+    required this.minY,
+    required this.maxY,
   });
 
   const ChartBounds.flexible()
@@ -21,25 +37,48 @@ class ChartBounds with EquatableMixin {
         minX = null,
         maxX = null;
 
+  const ChartBounds.point({double? x, double? y})
+      : minY = y,
+        maxY = y,
+        minX = x,
+        maxX = x;
+
   factory ChartBounds.merge(Iterable<ChartBounds> list) => list.fold(
         const ChartBounds.flexible(),
         (combined, bounds) => combined.mergeWith(bounds),
       );
 
-  // TODO: Check unbounded
-  double getFractionX(double x) {
+  double getFractionX(num x) {
     if (this case ChartBounds(:final minX?, :final maxX?)) {
       return (x - minX) / (maxX - minX);
     }
-    return x;
+
+    // TODO: Custom exception. Can't get fraction of unbounded
+    throw Error();
   }
 
-  // TODO: Check unbounded
-  double getFractionY(double y) {
+  double getFractionY(num y) {
     if (this case ChartBounds(:final minY?, :final maxY?)) {
       return 1 - (y - minY) / (maxY - minY);
     }
-    return y;
+
+    // TODO: Custom exception. Can't get fraction of unbounded
+    throw Error();
+  }
+
+  ChartBounds extendToNearestRounding() {
+    if (this case ChartBounds(:final minY?, :final maxY?)) {
+      final intervals = ChartIntervals(minValue: minY, maxValue: maxY);
+      return ChartBounds(
+        minY: intervals.values.first.toDouble(),
+        maxY: intervals.values.last.toDouble(),
+        minX: minX,
+        maxX: maxX,
+      );
+    }
+
+    // TODO: Custom exception. Can't get extend to nearest rounding of unbounded
+    throw Error();
   }
 
   ChartBounds mergeWith(ChartBounds other) => ChartBounds(

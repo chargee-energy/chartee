@@ -35,7 +35,7 @@ class BarStack extends ChartItem {
       throw Error();
     }
 
-    return ChartBounds(minY: minY, maxY: maxY, minX: x, maxX: x);
+    return ChartBounds(minX: x, maxX: x, minY: minY, maxY: maxY);
   }
 
   const BarStack({

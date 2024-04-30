@@ -80,18 +80,20 @@ class _GridLinesPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // TODO: Multiple lines, dashed lines, axis etc.
-    for (var i = 0; i < 2; i++) {
-      final line = lineBuilder(i, 0);
+    final intervals = bounds.intervals;
+    // TODO: Axis etc.
+    for (var i = 0; i < intervals.length; i++) {
+      final line = lineBuilder(i, intervals[i].toDouble());
       if (line != null) {
         final paint = Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = line.width
           ..color = line.color;
 
+        final y = size.height * bounds.getFractionY(intervals[i]);
         var path = Path()
-          ..moveTo(0, size.height * i)
-          ..lineTo(size.width, size.height * i);
+          ..moveTo(0, y)
+          ..lineTo(size.width, y);
 
         if (line.dashArray case final dashArray?) {
           path = createDashedPath(path, dashArray);

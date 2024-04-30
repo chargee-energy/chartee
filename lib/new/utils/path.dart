@@ -4,7 +4,7 @@ import '../models/chart_bounds.dart';
 import '../models/chart_point.dart';
 
 // TODO: Separate package together with dashed border
-Path createDashedPath(Path source, List<double> dashArray) {
+Path createDashedPath(Path source, List<num> dashArray) {
   final result = Path();
 
   for (final metric in source.computeMetrics()) {

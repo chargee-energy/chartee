@@ -11,7 +11,7 @@ class ChartLine extends StatelessWidget {
   final Color positiveColor;
   final Color negativeColor;
   final double lineWidth;
-  final List<double>? dashArray;
+  final List<num>? dashArray;
 
   const ChartLine({
     super.key,
@@ -44,7 +44,7 @@ class _LinePainter extends CustomPainter {
   final Color positiveColor;
   final Color negativeColor;
   final double lineWidth;
-  final List<double>? dashArray;
+  final List<num>? dashArray;
 
   late final _positivePaint = Paint()
     ..style = PaintingStyle.stroke
