@@ -7,8 +7,14 @@ import '../models/chart_bounds.dart';
 class ChartBars extends StatelessWidget {
   final ChartBounds bounds;
   final List<BarStack> barStacks;
+  final List<BarStack> selectedBarStacks;
 
-  const ChartBars({super.key, required this.bounds, required this.barStacks});
+  const ChartBars({
+    super.key,
+    required this.bounds,
+    required this.barStacks,
+    required this.selectedBarStacks,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,7 @@ class ChartBars extends StatelessWidget {
                       (bar) => _BarPainter(
                         bounds: barStack.bounds,
                         bar: bar,
-                        highlight: false, // TODO: Handle gestures
+                        highlight: selectedBarStacks.contains(barStack),
                       ),
                     )
                     .toList(),

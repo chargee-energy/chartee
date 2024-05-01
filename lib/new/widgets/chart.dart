@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../models/bar_stack.dart';
 import '../models/chart_bounds.dart';
 import '../models/chart_layer.dart';
 import 'chart_area.dart';
 import 'chart_bars.dart';
+import 'chart_gesture_handler.dart';
 import 'chart_grid.dart';
 import 'chart_line.dart';
+import 'chart_selection.dart';
 
 class Chart extends StatelessWidget {
   final List<ChartLayer> layers;
@@ -21,18 +24,17 @@ class Chart extends StatelessWidget {
       bounds = adjustBounds(bounds);
     }
 
-    return Stack(
-      fit: StackFit.expand,
-      children: layers
-          .map(
-            (layer) => Padding(
-              padding: EdgeInsets.fromLTRB(
-                layer.extendBehindLeadingLabels ? 0 : 16,
-                layer.extendBehindTopLabels ? 0 : 16,
-                layer.extendBehindTrailingLabels ? 0 : 16,
-                layer.extendBehindBottomLabels ? 0 : 16,
-              ),
-              child: switch (layer) {
+    // TODO: Apply padding from labels to gesture handler
+    return ChartGestureHandler(
+      bounds: bounds,
+      items: layers
+          .whereType<ChartItemLayer>()
+          .fold([], (result, layer) => [...result, ...layer.items]),
+      builder: (context, selectedItems) => Stack(
+        fit: StackFit.expand,
+        children: layers
+            .map(
+              (layer) => switch (layer) {
                 ChartGridLayer(
                   :final horizontalLineBuilder,
                   :final verticalLineBuilder,
@@ -41,6 +43,18 @@ class Chart extends StatelessWidget {
                     bounds: bounds,
                     horizontalLineBuilder: horizontalLineBuilder,
                     verticalLineBuilder: verticalLineBuilder,
+                  ),
+                ChartSelectionLayer(
+                  :final builder,
+                  :final sticky,
+                  :final initialItems,
+                ) =>
+                  ChartSelection(
+                    bounds: bounds,
+                    items: selectedItems,
+                    builder: builder,
+                    sticky: sticky,
+                    initialItems: initialItems,
                   ),
                 ChartLineLayer(
                   :final items,
@@ -68,12 +82,16 @@ class Chart extends StatelessWidget {
                     positiveColor: positiveColor,
                     negativeColor: negativeColor,
                   ),
-                ChartBarLayer(:final items) =>
-                  ChartBars(bounds: bounds, barStacks: items),
+                ChartBarLayer(:final items) => ChartBars(
+                    bounds: bounds,
+                    barStacks: items,
+                    selectedBarStacks:
+                        selectedItems.whereType<BarStack>().toList(),
+                  ),
               },
-            ),
-          )
-          .toList(),
+            )
+            .toList(),
+      ),
     );
   }
 }

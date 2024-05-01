@@ -7,6 +7,7 @@ import 'chart_bounds.dart';
 import 'chart_item.dart';
 import 'chart_point.dart';
 import 'grid_line.dart';
+import 'selection_builder.dart';
 
 sealed class ChartLayer with EquatableMixin {
   final bool extendBehindLeadingLabels;
@@ -70,6 +71,29 @@ class ChartGridLayer extends ChartLayer {
         horizontalLineBuilder,
         verticalLineBuilder,
       ];
+}
+
+class ChartSelectionLayer extends ChartLayer {
+  final SelectionBuilder builder;
+  final bool sticky;
+  final List<ChartItem> initialItems;
+
+  @override
+  ChartBounds get bounds => const ChartBounds.flexible();
+
+  const ChartSelectionLayer({
+    required this.builder,
+    this.sticky = false,
+    this.initialItems = const [],
+  }) : super(
+          extendBehindLeadingLabels: false,
+          extendBehindTrailingLabels: false,
+          extendBehindTopLabels: false,
+          extendBehindBottomLabels: false,
+        );
+
+  @override
+  List<Object?> get props => [...super.props, builder];
 }
 
 sealed class ChartItemLayer<Item extends ChartItem> extends ChartLayer {
