@@ -1,20 +1,9 @@
 import 'package:collection/collection.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/chart_bounds.dart';
 import '../models/chart_item.dart';
-
-class _ChartItemDistance with EquatableMixin {
-  final ChartItem item;
-  final double distance;
-
-  const _ChartItemDistance({required this.item, required this.distance});
-
-  @override
-  List<Object?> get props => [item, distance];
-}
 
 class ChartGestureHandler extends StatefulWidget {
   final ChartBounds bounds;
@@ -46,7 +35,7 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
 
     final distances = widget.items
         .map(
-          (item) => _ChartItemDistance(
+          (item) => (
             item: item,
             distance: (fractionX - widget.bounds.getFractionX(item.x)).abs(),
           ),

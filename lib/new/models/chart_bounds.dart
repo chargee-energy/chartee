@@ -11,8 +11,19 @@ class ChartBounds with EquatableMixin {
   final double? minY;
   final double? maxY;
 
-  // TODO: Exception if unbounded?
-  List<num> get intervals {
+  List<num> get intervalsX {
+    if (this case ChartBounds(:final minX?, :final maxX?)) {
+      final intervals = ChartIntervals(minValue: minX, maxValue: maxX);
+      return intervals.values
+          .where((value) => value >= minX && value <= maxX)
+          .toList();
+    }
+
+    // TODO: Custom exception. Can't get intervals of unbounded
+    throw Error();
+  }
+
+  List<num> get intervalsY {
     if (this case ChartBounds(:final minY?, :final maxY?)) {
       final intervals = ChartIntervals(minValue: minY, maxValue: maxY);
       return intervals.values
@@ -32,16 +43,16 @@ class ChartBounds with EquatableMixin {
   });
 
   const ChartBounds.flexible()
-      : minY = null,
-        maxY = null,
-        minX = null,
-        maxX = null;
+      : minX = null,
+        maxX = null,
+        minY = null,
+        maxY = null;
 
   const ChartBounds.point({double? x, double? y})
-      : minY = y,
-        maxY = y,
-        minX = x,
-        maxX = x;
+      : minX = x,
+        maxX = x,
+        minY = y,
+        maxY = y;
 
   factory ChartBounds.merge(Iterable<ChartBounds> list) => list.fold(
         const ChartBounds.flexible(),
@@ -66,14 +77,29 @@ class ChartBounds with EquatableMixin {
     throw Error();
   }
 
-  ChartBounds extendToNearestRounding() {
+  ChartBounds extendToNextIntervalX() {
+    if (this case ChartBounds(:final minX?, :final maxX?)) {
+      final intervals = ChartIntervals(minValue: minX, maxValue: maxX);
+      return ChartBounds(
+        minX: intervals.values.first.toDouble(),
+        maxX: intervals.values.last.toDouble(),
+        minY: minX,
+        maxY: maxX,
+      );
+    }
+
+    // TODO: Custom exception. Can't get extend to nearest rounding of unbounded
+    throw Error();
+  }
+
+  ChartBounds extendToNextIntervalY() {
     if (this case ChartBounds(:final minY?, :final maxY?)) {
       final intervals = ChartIntervals(minValue: minY, maxValue: maxY);
       return ChartBounds(
-        minY: intervals.values.first.toDouble(),
-        maxY: intervals.values.last.toDouble(),
         minX: minX,
         maxX: maxX,
+        minY: intervals.values.first.toDouble(),
+        maxY: intervals.values.last.toDouble(),
       );
     }
 
@@ -82,10 +108,10 @@ class ChartBounds with EquatableMixin {
   }
 
   ChartBounds mergeWith(ChartBounds other) => ChartBounds(
-        minY: _lowestValue(minY, other.minY),
-        maxY: _highestValue(maxY, other.maxY),
         minX: _lowestValue(minX, other.minX),
         maxX: _highestValue(maxX, other.maxX),
+        minY: _lowestValue(minY, other.minY),
+        maxY: _highestValue(maxY, other.maxY),
       );
 
   double? _lowestValue(double? a, double? b) {

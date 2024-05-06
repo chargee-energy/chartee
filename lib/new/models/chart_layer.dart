@@ -10,27 +10,12 @@ import 'grid_line.dart';
 import 'selection_builder.dart';
 
 sealed class ChartLayer with EquatableMixin {
-  final bool extendBehindLeadingLabels;
-  final bool extendBehindTrailingLabels;
-  final bool extendBehindTopLabels;
-  final bool extendBehindBottomLabels;
-
   ChartBounds get bounds;
 
-  const ChartLayer({
-    this.extendBehindLeadingLabels = false,
-    this.extendBehindTrailingLabels = false,
-    this.extendBehindTopLabels = false,
-    this.extendBehindBottomLabels = false,
-  });
+  const ChartLayer();
 
   @override
-  List<Object?> get props => [
-        extendBehindLeadingLabels,
-        extendBehindTrailingLabels,
-        extendBehindTopLabels,
-        extendBehindBottomLabels,
-      ];
+  List<Object?> get props => [];
 }
 
 class ChartGridLayer extends ChartLayer {
@@ -43,27 +28,13 @@ class ChartGridLayer extends ChartLayer {
   const ChartGridLayer.all({
     required this.horizontalLineBuilder,
     required this.verticalLineBuilder,
-    super.extendBehindLeadingLabels,
-    super.extendBehindTrailingLabels,
-    super.extendBehindTopLabels,
-    super.extendBehindBottomLabels,
   });
 
-  const ChartGridLayer.horizontal(
-    this.horizontalLineBuilder, {
-    super.extendBehindLeadingLabels,
-    super.extendBehindTrailingLabels,
-    super.extendBehindTopLabels,
-    super.extendBehindBottomLabels,
-  }) : verticalLineBuilder = null;
+  const ChartGridLayer.horizontal(this.horizontalLineBuilder)
+      : verticalLineBuilder = null;
 
-  const ChartGridLayer.vertical(
-    this.verticalLineBuilder, {
-    super.extendBehindLeadingLabels,
-    super.extendBehindTrailingLabels,
-    super.extendBehindTopLabels,
-    super.extendBehindBottomLabels,
-  }) : horizontalLineBuilder = null;
+  const ChartGridLayer.vertical(this.verticalLineBuilder)
+      : horizontalLineBuilder = null;
 
   @override
   List<Object?> get props => [
@@ -85,12 +56,7 @@ class ChartSelectionLayer extends ChartLayer {
     required this.builder,
     this.sticky = false,
     this.initialItems = const [],
-  }) : super(
-          extendBehindLeadingLabels: false,
-          extendBehindTrailingLabels: false,
-          extendBehindTopLabels: false,
-          extendBehindBottomLabels: false,
-        );
+  });
 
   @override
   List<Object?> get props => [...super.props, builder];
@@ -102,13 +68,7 @@ sealed class ChartItemLayer<Item extends ChartItem> extends ChartLayer {
   @override
   ChartBounds get bounds => ChartBounds.merge(items.map((item) => item.bounds));
 
-  const ChartItemLayer({required this.items})
-      : super(
-          extendBehindLeadingLabels: false,
-          extendBehindTrailingLabels: false,
-          extendBehindTopLabels: false,
-          extendBehindBottomLabels: false,
-        );
+  const ChartItemLayer({required this.items});
 
   @override
   List<Object?> get props => [...super.props, items];

@@ -27,6 +27,7 @@ export 'line/widgets/line_chart.dart';
 export 'new/models/bar_stack.dart';
 export 'new/models/bar.dart';
 export 'new/models/chart_bounds.dart';
+export 'new/models/labels.dart';
 export 'new/models/chart_layer.dart';
 export 'new/models/chart_point.dart';
 export 'new/models/grid_line.dart';
