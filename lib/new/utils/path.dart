@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import '../models/chart_bounds.dart';
-import '../models/chart_point.dart';
+import '../models/bounding_box.dart';
+import '../models/point.dart';
 
 // TODO: Separate package together with dashed border
 Path createDashedPath(Path source, List<num> dashArray) {
@@ -37,8 +37,8 @@ Path createDashedPath(Path source, List<num> dashArray) {
 
 Path? createPathFromChartPoints(
   Size size,
-  ChartBounds bounds,
-  List<ChartPoint> points, {
+  BoundingBox bounds,
+  List<Point> points, {
   bool closePath = false,
 }) {
   if (points.length < 2) {
@@ -70,7 +70,7 @@ Path? createPathFromChartPoints(
   return path;
 }
 
-Offset _getOffset(ChartBounds bounds, ChartPoint point, Size size) => Offset(
+Offset _getOffset(BoundingBox bounds, Point point, Size size) => Offset(
       bounds.getFractionX(point.x) * size.width,
       bounds.getFractionY(point.y) * size.height,
     );

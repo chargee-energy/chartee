@@ -2,11 +2,11 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../models/chart_bounds.dart';
+import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
 
 class ChartGestureHandler extends StatefulWidget {
-  final ChartBounds bounds;
+  final BoundingBox bounds;
   final List<ChartItem> items;
   final Widget Function(BuildContext context, List<ChartItem> selectedItems)
       builder;

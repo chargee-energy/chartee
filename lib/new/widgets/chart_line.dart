@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../models/chart_bounds.dart';
-import '../models/chart_point.dart';
+import '../models/bounding_box.dart';
+import '../models/point.dart';
 import '../utils/paint.dart';
 import '../utils/path.dart';
 
 class ChartLine extends StatelessWidget {
-  final ChartBounds bounds;
-  final List<ChartPoint> points;
+  final BoundingBox bounds;
+  final List<Point> points;
   final Color positiveColor;
   final Color negativeColor;
   final double lineWidth;
-  final List<num>? dashArray;
+  final List<double>? dashArray;
 
   const ChartLine({
     super.key,
@@ -39,12 +39,12 @@ class ChartLine extends StatelessWidget {
 }
 
 class _LinePainter extends CustomPainter {
-  final ChartBounds bounds;
-  final List<ChartPoint> points;
+  final BoundingBox bounds;
+  final List<Point> points;
   final Color positiveColor;
   final Color negativeColor;
   final double lineWidth;
-  final List<num>? dashArray;
+  final List<double>? dashArray;
 
   late final _positivePaint = Paint()
     ..style = PaintingStyle.stroke

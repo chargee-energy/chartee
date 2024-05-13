@@ -1,11 +1,11 @@
 import 'dart:ui';
 
-import '../models/chart_bounds.dart';
+import '../models/bounding_box.dart';
 
 void paintChartPath(
   Canvas canvas,
   Size size,
-  ChartBounds bounds,
+  BoundingBox bounds,
   Path path,
   Paint positivePaint,
   Paint negativePaint,

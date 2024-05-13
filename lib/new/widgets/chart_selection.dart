@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../models/chart_bounds.dart';
+import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
 import '../models/selection_builder.dart';
 
 class ChartSelection extends StatefulWidget {
-  final ChartBounds bounds;
+  final BoundingBox bounds;
   final List<ChartItem> items;
   final SelectionBuilder builder;
   final bool sticky;

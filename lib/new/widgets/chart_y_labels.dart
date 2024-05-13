@@ -1,57 +1,26 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-import '../models/chart_bounds.dart';
 import '../models/labels.dart';
 
-class ChartLabels extends StatelessWidget {
-  final ChartBounds bounds;
+class ChartYLabels extends StatelessWidget {
   final Labels labels;
-  final List<num> intervals;
+  final List<({double fraction, TextPainter painter})> values;
 
-  const ChartLabels({
-    super.key,
-    required this.bounds,
-    required this.labels,
-    required this.intervals,
-  });
+  const ChartYLabels({super.key, required this.labels, required this.values});
 
   @override
   Widget build(BuildContext context) {
-    final values = intervals
-        .mapIndexed(
-          (index, interval) {
-            final text = labels.getLabelText?.call(index, interval.toDouble());
-
-            if (text == null) {
-              return null;
-            }
-
-            final painter = TextPainter(
-              text: TextSpan(text: text, style: labels.style),
-              textAlign: labels.textAlign,
-              textDirection: TextDirection.ltr,
-            );
-            painter.layout();
-
-            return (
-              fraction: bounds.getFractionY(interval),
-              painter: painter,
-            );
-          },
-        )
-        .whereNotNull()
-        .toList();
-
-    final width = values.map((value) => value.painter.width).max;
-
-    return SizedBox(
-      width: width,
-      child: CustomPaint(
-        painter: _LabelsPainter(
-          values: values,
-          textAlign: labels.textAlign,
-          offset: labels.offset - 0.5,
+    return Padding(
+      padding: labels.padding.copyWith(top: 0, bottom: 0),
+      child: SizedBox(
+        width: values.map((value) => value.painter.width).max,
+        child: CustomPaint(
+          painter: _LabelsPainter(
+            values: values,
+            textAlign: labels.textAlign,
+            offset: labels.offset - 0.5,
+          ),
         ),
       ),
     );

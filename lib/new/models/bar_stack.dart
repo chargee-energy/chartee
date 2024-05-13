@@ -1,8 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/painting.dart';
 
+import '../errors/empty_error.dart';
 import 'bar.dart';
-import 'chart_bounds.dart';
+import 'bounding_box.dart';
 import 'chart_item.dart';
 
 class BarStack extends ChartItem {
@@ -11,31 +12,19 @@ class BarStack extends ChartItem {
   final BorderRadius borderRadius;
 
   double get minY {
-    if (bars.isEmpty) {
-      // TODO: Custom exception
-      throw Error();
-    }
-
+    _checkIfEmpty();
     return bars.map((bar) => bar.minValue).min;
   }
 
   double get maxY {
-    if (bars.isEmpty) {
-      // TODO: Custom exception
-      throw Error();
-    }
-
+    _checkIfEmpty();
     return bars.map((bar) => bar.maxValue).max;
   }
 
   @override
-  ChartBounds get bounds {
-    if (bars.isEmpty) {
-      // TODO: Custom exception
-      throw Error();
-    }
-
-    return ChartBounds(minX: x, maxX: x, minY: minY, maxY: maxY);
+  BoundingBox get bounds {
+    _checkIfEmpty();
+    return BoundingBox(minX: x, maxX: x, minY: minY, maxY: maxY);
   }
 
   const BarStack({
@@ -44,6 +33,15 @@ class BarStack extends ChartItem {
     this.width = 8,
     this.borderRadius = BorderRadius.zero,
   });
+
+  void _checkIfEmpty() {
+    if (bars.isEmpty) {
+      throw EmptyError(
+        message:
+            "BarStack instance is empty. It requires at least one 'Bar' object to calculate bounds and values.",
+      );
+    }
+  }
 
   @override
   List<Object?> get props => [width, borderRadius, bars];

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../models/bar.dart';
 import '../models/bar_stack.dart';
-import '../models/chart_bounds.dart';
+import '../models/bounding_box.dart';
 
 class ChartBars extends StatelessWidget {
-  final ChartBounds bounds;
+  final BoundingBox bounds;
   final List<BarStack> barStacks;
   final List<BarStack> selectedBarStacks;
 
@@ -44,7 +44,7 @@ class ChartBars extends StatelessWidget {
 }
 
 class _BarStackPainter extends CustomPainter {
-  final ChartBounds bounds;
+  final BoundingBox bounds;
   final BarStack barStack;
   final List<CustomPainter> children;
 
@@ -94,7 +94,7 @@ class _BarStackPainter extends CustomPainter {
 }
 
 class _BarPainter extends CustomPainter {
-  final ChartBounds bounds;
+  final BoundingBox bounds;
   final Bar bar;
   final bool highlight;
 

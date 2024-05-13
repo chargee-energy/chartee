@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/bar_stack.dart';
-import '../models/chart_bounds.dart';
+import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
 import '../models/chart_layer.dart';
 import 'chart_area.dart';
@@ -11,13 +11,17 @@ import 'chart_line.dart';
 import 'chart_selection.dart';
 
 class ChartLayerStack extends StatelessWidget {
-  final ChartBounds bounds;
+  final BoundingBox bounds;
+  final List<double> intervalsX;
+  final List<double> intervalsY;
   final List<ChartLayer> layers;
   final List<ChartItem> selectedItems;
 
   const ChartLayerStack({
     super.key,
     required this.bounds,
+    required this.intervalsX,
+    required this.intervalsY,
     required this.layers,
     required this.selectedItems,
   });
@@ -35,6 +39,8 @@ class ChartLayerStack extends StatelessWidget {
               ) =>
                 ChartGrid(
                   bounds: bounds,
+                  intervalsX: intervalsX,
+                  intervalsY: intervalsY,
                   horizontalLineBuilder: horizontalLineBuilder,
                   verticalLineBuilder: verticalLineBuilder,
                 ),

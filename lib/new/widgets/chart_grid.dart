@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 
-import '../models/chart_bounds.dart';
+import '../models/bounding_box.dart';
 import '../models/grid_line.dart';
 import '../utils/path.dart';
 
 class ChartGrid extends StatelessWidget {
-  final ChartBounds bounds;
+  final BoundingBox bounds;
+  final List<double> intervalsX;
+  final List<double> intervalsY;
   final GridLineBuilder? horizontalLineBuilder;
   final GridLineBuilder? verticalLineBuilder;
 
   const ChartGrid({
     super.key,
     required this.bounds,
+    required this.intervalsX,
+    required this.intervalsY,
     this.horizontalLineBuilder,
     this.verticalLineBuilder,
   });
@@ -25,6 +29,7 @@ class ChartGrid extends StatelessWidget {
         _GridLinesPainter(
           axis: Axis.horizontal,
           bounds: bounds,
+          intervals: intervalsY,
           lineBuilder: horizontalLineBuilder,
         ),
       );
@@ -35,6 +40,7 @@ class ChartGrid extends StatelessWidget {
         _GridLinesPainter(
           axis: Axis.vertical,
           bounds: bounds,
+          intervals: intervalsX,
           lineBuilder: verticalLineBuilder,
         ),
       );
@@ -63,12 +69,14 @@ class _GridPainter extends CustomPainter {
 
 class _GridLinesPainter extends CustomPainter {
   final Axis axis;
-  final ChartBounds bounds;
+  final BoundingBox bounds;
+  final List<double> intervals;
   final GridLineBuilder lineBuilder;
 
   _GridLinesPainter({
     required this.axis,
     required this.bounds,
+    required this.intervals,
     required this.lineBuilder,
   });
 
@@ -76,15 +84,11 @@ class _GridLinesPainter extends CustomPainter {
   bool shouldRepaint(covariant _GridLinesPainter oldDelegate) =>
       axis != oldDelegate.axis ||
       bounds != oldDelegate.bounds ||
+      intervals != oldDelegate.intervals ||
       lineBuilder != oldDelegate.lineBuilder;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final intervals = switch (axis) {
-      Axis.horizontal => bounds.intervalsY,
-      Axis.vertical => bounds.intervalsX,
-    };
-
     for (var i = 0; i < intervals.length; i++) {
       final line = lineBuilder(i, intervals[i].toDouble());
       if (line != null) {

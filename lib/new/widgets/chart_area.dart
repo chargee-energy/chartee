@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../models/chart_bounds.dart';
-import '../models/chart_point.dart';
+import '../models/bounding_box.dart';
+import '../models/point.dart';
 import '../utils/paint.dart';
 import '../utils/path.dart';
 
 class ChartArea extends StatelessWidget {
-  final ChartBounds bounds;
-  final List<ChartPoint> points;
+  final BoundingBox bounds;
+  final List<Point> points;
   final Color positiveColor;
   final Color negativeColor;
 
@@ -33,8 +33,8 @@ class ChartArea extends StatelessWidget {
 }
 
 class _AreaPainter extends CustomPainter {
-  final ChartBounds bounds;
-  final List<ChartPoint> points;
+  final BoundingBox bounds;
+  final List<Point> points;
   final Color positiveColor;
   final Color negativeColor;
 
