@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'bar_stack.dart';
 import 'bounding_box.dart';
 import 'chart_item.dart';
+import 'cursor_builder.dart';
 import 'point.dart';
 import 'grid_line.dart';
 import 'selection_builder.dart';
@@ -59,7 +60,7 @@ class ChartSelectionLayer extends ChartLayer {
   });
 
   @override
-  List<Object?> get props => [...super.props, builder];
+  List<Object?> get props => [...super.props, builder, sticky, initialItems];
 }
 
 sealed class ChartItemLayer<Item extends ChartItem> extends ChartLayer {
@@ -98,6 +99,7 @@ class ChartLineLayer extends ChartItemLayer<Point> {
         positiveColor,
         negativeColor,
         lineWidth,
+        dashArray,
       ];
 }
 
@@ -113,4 +115,17 @@ class ChartAreaLayer extends ChartItemLayer<Point> {
 
   @override
   List<Object?> get props => [...super.props, positiveColor, negativeColor];
+}
+
+class ChartCursorLayer extends ChartLayer {
+  final CursorBuilder builder;
+  final Point point;
+
+  @override
+  BoundingBox get bounds => const BoundingBox.flexible();
+
+  const ChartCursorLayer({required this.builder, required this.point});
+
+  @override
+  List<Object?> get props => [...super.props, builder, point];
 }

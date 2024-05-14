@@ -6,6 +6,7 @@ import '../models/chart_item.dart';
 import '../models/chart_layer.dart';
 import 'chart_area.dart';
 import 'chart_bars.dart';
+import 'chart_cursor.dart';
 import 'chart_grid.dart';
 import 'chart_line.dart';
 import 'chart_selection.dart';
@@ -88,6 +89,8 @@ class ChartLayerStack extends StatelessWidget {
                   selectedBarStacks:
                       selectedItems.whereType<BarStack>().toList(),
                 ),
+              ChartCursorLayer(:final builder, :final point) =>
+                ChartCursor(bounds: bounds, builder: builder, point: point),
             },
           )
           .toList(),
