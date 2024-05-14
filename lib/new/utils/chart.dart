@@ -5,39 +5,36 @@ import 'package:collection/collection.dart';
 import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
 
-/// Have nice round numbers on the chart, this automatically works for small
-/// and big numbers.
-///
-/// index 0 -> relative coordinate
-/// index 1 -> scale
-const _scale = <List<double>>[
-  [1, 0.4],
-  [2, 0.5],
-  [3, 1.5],
-  [4, 1],
-  [5, 2],
-  [7, 3],
-  [8, 4],
-  [9, 3],
-  [10, 4],
-];
+List<double> _niceIntervals(double min, double max, int numberOfTicks) {
+  // Calculate initial interval
+  final dataRange = max - min;
+  final interval = dataRange / numberOfTicks;
 
-List<double>? _findNearestScale(double relativeValue) =>
-    _scale.firstWhereOrNull((value) => value[0] >= relativeValue.ceil());
+  // Determine exponent for rounding
+  final exponent = (math.log(interval) / math.ln10).floor();
+  final factor = interval / math.pow(10, exponent);
 
-/// Get a nice rounded value to base the chart line values on
-double _getRoundedBaseValue(double max) {
-  // Find the magnitude (order of magnitude) of maxY
-  final magnitude = (math.log(max) / math.ln10).floor();
+  // Choose a "nice" base interval (1, 2, or 5)
+  double niceInterval;
+  if (factor < 1.5) {
+    niceInterval = 1.0 * math.pow(10, exponent);
+  } else if (factor < 3) {
+    niceInterval = 2.0 * math.pow(10, exponent);
+  } else {
+    niceInterval = 5.0 * math.pow(10, exponent);
+  }
 
-  // Scale maxY down to have only the first digit and the rest behind the comma
-  final relativeY = max / math.pow(10, magnitude);
+  // Recalculate tick range
+  final startTick = (min / niceInterval).floor() * niceInterval;
+  final endTick = (max / niceInterval).ceil() * niceInterval;
 
-  // Find the nearest scale and multiply it by the magnitude to get the rounded value
-  final nearestScale = _findNearestScale(relativeY)?[1] ?? 0.5;
-  final roundedValue = nearestScale * math.pow(10, magnitude);
+  // Generate tick values
+  final ticks = <double>[];
+  for (var tick = startTick; tick <= endTick; tick += niceInterval) {
+    ticks.add(tick);
+  }
 
-  return roundedValue;
+  return ticks;
 }
 
 typedef IntervalsBuilder = List<double> Function(
@@ -71,35 +68,16 @@ class IntervalsY {
     return [min, max];
   }
 
-  static List<double> rounded(BoundingBox bounds, List<ChartItem> items) {
-    final min = bounds.minY;
-    final max = bounds.maxY;
+  static IntervalsBuilder rounded({int numberOfTicks = 3}) => (bounds, items) {
+        final min = bounds.minY;
+        final max = bounds.maxY;
 
-    if (min == null || max == null) {
-      return [];
-    }
+        if (min == null || max == null) {
+          return [];
+        }
 
-    final value = math.max(min.abs(), max.abs());
-    final baseValue = _getRoundedBaseValue(value.abs());
-    final lines = <double>[];
-
-    var start = min;
-    var end = max;
-
-    if (start % baseValue != 0) {
-      start = baseValue * (start / baseValue).floor();
-    }
-
-    if (end % baseValue != 0) {
-      end = baseValue * (end / baseValue).ceil();
-    }
-
-    for (var line = start; line <= end; line += baseValue) {
-      lines.add(line);
-    }
-
-    return lines;
-  }
+        return _niceIntervals(min, max, numberOfTicks);
+      };
 }
 
 typedef BoundsAdjuster = BoundingBox Function(BoundingBox bounds);
@@ -132,33 +110,17 @@ class AdjustBounds {
     double? min,
     double? max,
   ) {
-    final value = switch ((min, max)) {
-      (final min?, null) => min,
-      (null, final max?) => max,
-      (final min?, final max?) => math.max(min, max),
-      (null, null) => null
-    };
-
-    if (value == null) {
-      return (null, null);
+    if (min == null || max == null) {
+      // TODO: Can we calculate something if one of them is null?
+      return (min, max);
     }
 
-    final baseValue = _getRoundedBaseValue(value.abs());
-    double? resultMin;
-    double? resultMax;
+    final intervals = _niceIntervals(min, max, 3);
 
-    if (min != null) {
-      final minCount =
-          min < 0 ? (min / baseValue).floor() : (min / baseValue).ceil();
-      resultMin = minCount * baseValue;
+    if (intervals.isEmpty) {
+      return (min, max);
     }
 
-    if (max != null) {
-      final maxCount =
-          max < 0 ? (max / baseValue).floor() : (max / baseValue).ceil();
-      resultMax = maxCount * baseValue;
-    }
-
-    return (resultMin, resultMax);
+    return (intervals.first, intervals.last);
   }
 }
