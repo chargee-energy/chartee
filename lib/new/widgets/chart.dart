@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -38,17 +40,17 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initialBounds =
+    final bounds =
         adjustBounds(BoundingBox.merge(layers.map((layer) => layer.bounds)));
 
     final items = layers
         .whereType<ChartItemLayer>()
         .fold(<ChartItem>[], (result, layer) => [...result, ...layer.items]);
 
-    final xIntervals = xIntervalsProvider(initialBounds, items);
-    final yIntervals = yIntervalsProvider(initialBounds, items);
+    final xIntervals = xIntervalsProvider(bounds, items);
+    final yIntervals = yIntervalsProvider(bounds, items);
 
-    final bounds = BoundingBox.merge(
+    final intervalsAdjustedBounds = BoundingBox.merge(
       [
         xIntervals.adjustedBounds,
         yIntervals.adjustedBounds,
@@ -58,57 +60,48 @@ class Chart extends StatelessWidget {
     final topLabelValues = _getLabelValues(
       topLabels,
       xIntervals.intervals,
-      bounds.getFractionX,
+      intervalsAdjustedBounds.getFractionX,
     );
 
     final bottomLabelValues = _getLabelValues(
       bottomLabels,
       xIntervals.intervals,
-      bounds.getFractionX,
+      intervalsAdjustedBounds.getFractionX,
     );
 
     final leftLabelValues = _getLabelValues(
       leftLabels,
       yIntervals.intervals,
-      bounds.getFractionY,
+      intervalsAdjustedBounds.getFractionY,
     );
 
     final rightLabelValues = _getLabelValues(
       rightLabels,
       yIntervals.intervals,
-      bounds.getFractionY,
+      intervalsAdjustedBounds.getFractionY,
     );
 
-    // TODO: Don't add padding if there are no values
-    final topLabelsHeight =
-        (topLabelValues?.map((value) => value.painter.height).maxOrNull ?? 0) +
-            (topLabels?.padding.vertical ?? 0);
-    final bottomLabelsHeight =
-        (bottomLabelValues?.map((value) => value.painter.height).maxOrNull ??
-                0) +
-            (bottomLabels?.padding.vertical ?? 0);
-    final leftLabelsWidth =
-        (leftLabelValues?.map((value) => value.painter.width).maxOrNull ?? 0) +
-            (leftLabels?.padding.horizontal ?? 0);
-    final rightLabelsWidth =
-        (rightLabelValues?.map((value) => value.painter.width).maxOrNull ?? 0) +
-            (rightLabels?.padding.horizontal ?? 0);
+    final topLabelsSize = _getLargestLabelSize(topLabels, topLabelValues);
+    final bottomLabelsSize =
+        _getLargestLabelSize(bottomLabels, bottomLabelValues);
+    final leftLabelsSize = _getLargestLabelSize(leftLabels, leftLabelValues);
+    final rightLabelsSize = _getLargestLabelSize(leftLabels, rightLabelValues);
 
     return Stack(
       fit: StackFit.expand,
       children: [
         ...layers.whereType<ChartGridLayer>().map(
               (layer) => ChartGrid(
-                bounds: bounds,
+                bounds: intervalsAdjustedBounds,
                 xIntervals: xIntervals.intervals,
                 yIntervals: yIntervals.intervals,
                 horizontalLineBuilder: layer.horizontalLineBuilder,
                 verticalLineBuilder: layer.verticalLineBuilder,
                 padding: EdgeInsets.only(
-                  top: topLabelsHeight,
-                  bottom: bottomLabelsHeight,
-                  left: leftLabelsWidth,
-                  right: rightLabelsWidth,
+                  top: topLabelsSize.height,
+                  bottom: bottomLabelsSize.height,
+                  left: leftLabelsSize.width,
+                  right: rightLabelsSize.width,
                 ),
               ),
             ),
@@ -119,8 +112,8 @@ class Chart extends StatelessWidget {
                 when leftLabelValues != null && leftLabelValues.isNotEmpty)
               Padding(
                 padding: EdgeInsets.only(
-                  top: topLabelsHeight,
-                  bottom: bottomLabelsHeight,
+                  top: topLabelsSize.height,
+                  bottom: bottomLabelsSize.height,
                 ),
                 child: ChartYLabels(
                   labels: leftLabels,
@@ -139,10 +132,10 @@ class Chart extends StatelessWidget {
                     ),
                   Expanded(
                     child: ChartGestureHandler(
-                      bounds: bounds,
+                      bounds: intervalsAdjustedBounds,
                       items: items,
                       builder: (context, selectedItems) => ChartLayerStack(
-                        bounds: bounds,
+                        bounds: intervalsAdjustedBounds,
                         xIntervals: xIntervals.intervals,
                         yIntervals: yIntervals.intervals,
                         layers: layers,
@@ -164,8 +157,8 @@ class Chart extends StatelessWidget {
                 when rightLabelValues != null && rightLabelValues.isNotEmpty)
               Padding(
                 padding: EdgeInsets.only(
-                  top: topLabelsHeight,
-                  bottom: bottomLabelsHeight,
+                  top: topLabelsSize.height,
+                  bottom: bottomLabelsSize.height,
                 ),
                 child: ChartYLabels(
                   labels: rightLabels,
@@ -209,4 +202,28 @@ class Chart extends StatelessWidget {
               .whereNotNull()
               .toList()
           : null;
+
+  Size _getLargestLabelSize(
+    Labels? labels,
+    List<({double fraction, TextPainter painter})>? values,
+  ) {
+    if (values == null) {
+      return Size.zero;
+    }
+
+    final horizontalPadding = labels?.padding.horizontal ?? 0;
+    final verticalPadding = labels?.padding.vertical ?? 0;
+    final largestLabelSize = values.map((value) => value.painter.size).fold(
+          Size.zero,
+          (result, size) => Size(
+            max(result.width, size.width),
+            max(result.height, size.height),
+          ),
+        );
+
+    return Size(
+      largestLabelSize.width + horizontalPadding,
+      largestLabelSize.height + verticalPadding,
+    );
+  }
 }
