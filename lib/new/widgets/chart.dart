@@ -19,6 +19,7 @@ class Chart extends StatelessWidget {
   final Labels? rightLabels;
   final Labels? topLabels;
   final Labels? bottomLabels;
+  final ValueChanged<List<ChartItem>>? onSelectionChanged;
   final BoundsAdjuster adjustBounds;
   final IntervalsProvider Function(BoundingBox bounds, List<ChartItem> items)
       xIntervalsProvider;
@@ -32,6 +33,7 @@ class Chart extends StatelessWidget {
     this.rightLabels,
     this.topLabels,
     this.bottomLabels,
+    this.onSelectionChanged,
     this.adjustBounds = AdjustBounds.noAdjustment,
     this.xIntervalsProvider = OutlineXIntervals.create,
     this.yIntervalsProvider = OutlineYIntervals.create,
@@ -97,6 +99,7 @@ class Chart extends StatelessWidget {
       padding: padding,
       bounds: intervalsAdjustedBounds,
       items: items,
+      onSelectionChanged: onSelectionChanged,
       builder: (context, selectedItems) => ChartLayerStack(
         padding: padding,
         bounds: intervalsAdjustedBounds,

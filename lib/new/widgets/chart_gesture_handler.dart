@@ -9,6 +9,7 @@ class ChartGestureHandler extends StatefulWidget {
   final EdgeInsets padding;
   final BoundingBox bounds;
   final List<ChartItem> items;
+  final ValueChanged<List<ChartItem>>? onSelectionChanged;
   final Widget Function(BuildContext context, List<ChartItem> selectedItems)
       builder;
 
@@ -17,6 +18,7 @@ class ChartGestureHandler extends StatefulWidget {
     required this.padding,
     required this.bounds,
     required this.items,
+    required this.onSelectionChanged,
     required this.builder,
   });
 
@@ -55,6 +57,7 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
 
   void _setSelectedItems(List<ChartItem> items) {
     if (!listEquals(_selectedItems, items)) {
+      widget.onSelectionChanged?.call(items);
       setState(() {
         _selectedItems = items;
       });
@@ -63,6 +66,7 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
 
   void _resetSelectedItems() {
     if (_selectedItems.isNotEmpty) {
+      widget.onSelectionChanged?.call([]);
       setState(() {
         _selectedItems = [];
       });
