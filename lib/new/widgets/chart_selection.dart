@@ -11,6 +11,7 @@ class ChartSelection extends StatefulWidget {
   final SelectionBuilder builder;
   final bool sticky;
   final List<ChartItem> initialItems;
+  final EdgeInsets padding;
 
   const ChartSelection({
     super.key,
@@ -19,6 +20,7 @@ class ChartSelection extends StatefulWidget {
     required this.builder,
     required this.sticky,
     required this.initialItems,
+    this.padding = EdgeInsets.zero,
   });
 
   @override
@@ -65,11 +67,11 @@ class _ChartSelectionState extends State<ChartSelection> {
       final ownBox = context.findRenderObject()?.parent as RenderBox;
       final tooltipBox = _key.currentContext?.findRenderObject() as RenderBox;
 
-      final centerX =
-          widget.bounds.getFractionX(_items.first.x) * ownBox.size.width;
+      final width = ownBox.size.width - widget.padding.horizontal;
+      final centerX = widget.bounds.getFractionX(_items.first.x) * width;
 
       final left = (centerX - tooltipBox.size.width / 2)
-          .clamp(0, ownBox.size.width - tooltipBox.size.width)
+          .clamp(0, width - tooltipBox.size.width)
           .toDouble();
 
       final tooltipCenterX = left + tooltipBox.size.width / 2;
@@ -87,9 +89,9 @@ class _ChartSelectionState extends State<ChartSelection> {
   Widget build(BuildContext context) {
     if (_items.isNotEmpty) {
       return Positioned(
-        top: 0,
-        bottom: 0,
-        left: _offsetLeft,
+        top: widget.padding.top,
+        bottom: widget.padding.bottom,
+        left: widget.padding.left + _offsetLeft,
         child: Offstage(
           offstage: _offstage,
           child: Container(

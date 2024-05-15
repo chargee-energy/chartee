@@ -9,7 +9,6 @@ import '../models/chart_layer.dart';
 import '../models/labels.dart';
 import '../utils/chart.dart';
 import 'chart_gesture_handler.dart';
-import 'chart_grid.dart';
 import 'chart_layer_stack.dart';
 import 'chart_x_labels.dart';
 import 'chart_y_labels.dart';
@@ -85,89 +84,74 @@ class Chart extends StatelessWidget {
     final bottomLabelsSize =
         _getLargestLabelSize(bottomLabels, bottomLabelValues);
     final leftLabelsSize = _getLargestLabelSize(leftLabels, leftLabelValues);
-    final rightLabelsSize = _getLargestLabelSize(leftLabels, rightLabelValues);
+    final rightLabelsSize = _getLargestLabelSize(rightLabels, rightLabelValues);
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        ...layers.whereType<ChartGridLayer>().map(
-              (layer) => ChartGrid(
-                bounds: intervalsAdjustedBounds,
-                xIntervals: xIntervals.intervals,
-                yIntervals: yIntervals.intervals,
-                horizontalLineBuilder: layer.horizontalLineBuilder,
-                verticalLineBuilder: layer.verticalLineBuilder,
-                padding: EdgeInsets.only(
-                  top: topLabelsSize.height,
-                  bottom: bottomLabelsSize.height,
-                  left: leftLabelsSize.width,
-                  right: rightLabelsSize.width,
-                ),
+    return ChartGestureHandler(
+      bounds: intervalsAdjustedBounds,
+      items: items,
+      builder: (context, selectedItems) => ChartLayerStack(
+        bounds: intervalsAdjustedBounds,
+        xIntervals: xIntervals.intervals,
+        yIntervals: yIntervals.intervals,
+        layers: layers,
+        selectedItems: selectedItems,
+        labels: [
+          if (topLabels case final labels?
+              when topLabelValues != null && topLabelValues.isNotEmpty)
+            Positioned(
+              left: leftLabelsSize.width,
+              right: rightLabelsSize.width,
+              top: labels.padding.top,
+              height: topLabelsSize.height - labels.padding.vertical,
+              child: ChartXLabels(
+                labels: labels,
+                values: topLabelValues,
               ),
             ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (leftLabels case final leftLabels?
-                when leftLabelValues != null && leftLabelValues.isNotEmpty)
-              Padding(
-                padding: EdgeInsets.only(
-                  top: topLabelsSize.height,
-                  bottom: bottomLabelsSize.height,
-                ),
-                child: ChartYLabels(
-                  labels: leftLabels,
-                  values: leftLabelValues,
-                ),
-              ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (topLabels case final topLabels?
-                      when topLabelValues != null && topLabelValues.isNotEmpty)
-                    ChartXLabels(
-                      labels: topLabels,
-                      values: topLabelValues,
-                    ),
-                  Expanded(
-                    child: ChartGestureHandler(
-                      bounds: intervalsAdjustedBounds,
-                      items: items,
-                      builder: (context, selectedItems) => ChartLayerStack(
-                        bounds: intervalsAdjustedBounds,
-                        xIntervals: xIntervals.intervals,
-                        yIntervals: yIntervals.intervals,
-                        layers: layers,
-                        selectedItems: selectedItems,
-                      ),
-                    ),
-                  ),
-                  if (bottomLabels case final bottomLabels?
-                      when bottomLabelValues != null &&
-                          bottomLabelValues.isNotEmpty)
-                    ChartXLabels(
-                      labels: bottomLabels,
-                      values: bottomLabelValues,
-                    ),
-                ],
+          if (bottomLabels case final labels?
+              when bottomLabelValues != null && bottomLabelValues.isNotEmpty)
+            Positioned(
+              left: leftLabelsSize.width,
+              right: rightLabelsSize.width,
+              bottom: labels.padding.bottom,
+              height: bottomLabelsSize.height - labels.padding.vertical,
+              child: ChartXLabels(
+                labels: labels,
+                values: bottomLabelValues,
               ),
             ),
-            if (rightLabels case final rightLabels?
-                when rightLabelValues != null && rightLabelValues.isNotEmpty)
-              Padding(
-                padding: EdgeInsets.only(
-                  top: topLabelsSize.height,
-                  bottom: bottomLabelsSize.height,
-                ),
-                child: ChartYLabels(
-                  labels: rightLabels,
-                  values: rightLabelValues,
-                ),
+          if (leftLabels case final labels?
+              when leftLabelValues != null && leftLabelValues.isNotEmpty)
+            Positioned(
+              top: topLabelsSize.height,
+              bottom: bottomLabelsSize.height,
+              left: labels.padding.left,
+              width: leftLabelsSize.width - labels.padding.horizontal,
+              child: ChartYLabels(
+                labels: labels,
+                values: leftLabelValues,
               ),
-          ],
+            ),
+          if (rightLabels case final labels?
+              when rightLabelValues != null && rightLabelValues.isNotEmpty)
+            Positioned(
+              top: topLabelsSize.height,
+              bottom: bottomLabelsSize.height,
+              right: labels.padding.right,
+              width: rightLabelsSize.width - labels.padding.horizontal,
+              child: ChartYLabels(
+                labels: labels,
+                values: rightLabelValues,
+              ),
+            ),
+        ],
+        padding: EdgeInsets.only(
+          top: topLabelsSize.height,
+          bottom: bottomLabelsSize.height,
+          left: leftLabelsSize.width,
+          right: rightLabelsSize.width,
         ),
-      ],
+      ),
     );
   }
 

@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../models/labels.dart';
@@ -11,17 +10,11 @@ class ChartXLabels extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: labels.padding.copyWith(left: 0, right: 0),
-      child: SizedBox(
-        height: values.map((value) => value.painter.height).max,
-        child: CustomPaint(
-          painter: _LabelsPainter(
-            values: values,
-            textAlign: labels.textAlign,
-            offset: labels.offset - 0.5,
-          ),
-        ),
+    return CustomPaint(
+      painter: _LabelsPainter(
+        values: values,
+        textAlign: labels.textAlign,
+        offset: labels.offset - 0.5,
       ),
     );
   }
