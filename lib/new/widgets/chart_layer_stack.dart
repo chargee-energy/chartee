@@ -12,23 +12,23 @@ import 'chart_line.dart';
 import 'chart_selection.dart';
 
 class ChartLayerStack extends StatelessWidget {
+  final EdgeInsets padding;
   final BoundingBox bounds;
   final List<double> xIntervals;
   final List<double> yIntervals;
   final List<ChartLayer> layers;
   final List<ChartItem> selectedItems;
   final List<Widget> labels;
-  final EdgeInsets padding;
 
   const ChartLayerStack({
     super.key,
+    required this.padding,
     required this.bounds,
     required this.xIntervals,
     required this.yIntervals,
     required this.layers,
     required this.selectedItems,
     required this.labels,
-    this.padding = EdgeInsets.zero,
   });
 
   @override
@@ -44,12 +44,12 @@ class ChartLayerStack extends StatelessWidget {
               :final verticalLineBuilder,
             ) =>
               ChartGrid(
+                padding: padding,
                 bounds: bounds,
                 xIntervals: xIntervals,
                 yIntervals: yIntervals,
                 horizontalLineBuilder: horizontalLineBuilder,
                 verticalLineBuilder: verticalLineBuilder,
-                padding: padding,
               ),
             ChartSelectionLayer(
               :final builder,
@@ -57,12 +57,12 @@ class ChartLayerStack extends StatelessWidget {
               :final initialItems,
             ) =>
               ChartSelection(
+                padding: padding,
                 bounds: bounds,
                 items: selectedItems,
                 builder: builder,
                 sticky: sticky,
                 initialItems: initialItems,
-                padding: padding,
               ),
             ChartLineLayer(
               :final items,

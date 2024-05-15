@@ -6,21 +6,21 @@ import '../models/chart_item.dart';
 import '../models/selection_builder.dart';
 
 class ChartSelection extends StatefulWidget {
+  final EdgeInsets padding;
   final BoundingBox bounds;
   final List<ChartItem> items;
   final SelectionBuilder builder;
   final bool sticky;
   final List<ChartItem> initialItems;
-  final EdgeInsets padding;
 
   const ChartSelection({
     super.key,
+    required this.padding,
     required this.bounds,
     required this.items,
     required this.builder,
     required this.sticky,
     required this.initialItems,
-    this.padding = EdgeInsets.zero,
   });
 
   @override
@@ -64,10 +64,10 @@ class _ChartSelectionState extends State<ChartSelection> {
 
   void _updatePosition() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ownBox = context.findRenderObject()?.parent as RenderBox;
+      final parentBox = context.findRenderObject()?.parent as RenderBox;
       final tooltipBox = _key.currentContext?.findRenderObject() as RenderBox;
 
-      final width = ownBox.size.width - widget.padding.horizontal;
+      final width = parentBox.size.width - widget.padding.horizontal;
       final centerX = widget.bounds.getFractionX(_items.first.x) * width;
 
       final left = (centerX - tooltipBox.size.width / 2)

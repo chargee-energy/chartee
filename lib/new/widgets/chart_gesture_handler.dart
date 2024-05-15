@@ -6,6 +6,7 @@ import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
 
 class ChartGestureHandler extends StatefulWidget {
+  final EdgeInsets padding;
   final BoundingBox bounds;
   final List<ChartItem> items;
   final Widget Function(BuildContext context, List<ChartItem> selectedItems)
@@ -13,6 +14,7 @@ class ChartGestureHandler extends StatefulWidget {
 
   const ChartGestureHandler({
     super.key,
+    required this.padding,
     required this.bounds,
     required this.items,
     required this.builder,
@@ -31,7 +33,9 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
     }
 
     final renderBox = context.findRenderObject() as RenderBox;
-    final fractionX = localPosition.dx / renderBox.size.width;
+    final width = renderBox.size.width - widget.padding.horizontal;
+    final x = localPosition.dx - widget.padding.left;
+    final fractionX = x / width;
 
     final distances = widget.items
         .map(

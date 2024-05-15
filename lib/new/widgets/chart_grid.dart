@@ -5,21 +5,21 @@ import '../models/grid_line.dart';
 import '../utils/path.dart';
 
 class ChartGrid extends StatelessWidget {
+  final EdgeInsets padding;
   final BoundingBox bounds;
   final List<double> xIntervals;
   final List<double> yIntervals;
   final GridLineBuilder? horizontalLineBuilder;
   final GridLineBuilder? verticalLineBuilder;
-  final EdgeInsets padding;
 
   const ChartGrid({
     super.key,
+    required this.padding,
     required this.bounds,
     required this.xIntervals,
     required this.yIntervals,
     this.horizontalLineBuilder,
     this.verticalLineBuilder,
-    this.padding = EdgeInsets.zero,
   });
 
   @override

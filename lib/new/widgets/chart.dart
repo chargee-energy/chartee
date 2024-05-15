@@ -86,10 +86,19 @@ class Chart extends StatelessWidget {
     final leftLabelsSize = _getLargestLabelSize(leftLabels, leftLabelValues);
     final rightLabelsSize = _getLargestLabelSize(rightLabels, rightLabelValues);
 
+    final padding = EdgeInsets.fromLTRB(
+      leftLabelsSize.width,
+      topLabelsSize.height,
+      rightLabelsSize.width,
+      bottomLabelsSize.height,
+    );
+
     return ChartGestureHandler(
+      padding: padding,
       bounds: intervalsAdjustedBounds,
       items: items,
       builder: (context, selectedItems) => ChartLayerStack(
+        padding: padding,
         bounds: intervalsAdjustedBounds,
         xIntervals: xIntervals.intervals,
         yIntervals: yIntervals.intervals,
@@ -145,12 +154,6 @@ class Chart extends StatelessWidget {
               ),
             ),
         ],
-        padding: EdgeInsets.only(
-          top: topLabelsSize.height,
-          bottom: bottomLabelsSize.height,
-          left: leftLabelsSize.width,
-          right: rightLabelsSize.width,
-        ),
       ),
     );
   }
