@@ -5,54 +5,57 @@ import 'package:collection/collection.dart';
 import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
 
-List<double> _niceIntervals(double min, double max, int numberOfTicks) {
-  // Calculate initial interval
-  final interval = (min - max) / numberOfTicks;
+typedef BoundsAdjuster = BoundingBox Function(BoundingBox bounds);
 
-  // Determine exponent for rounding
-  final exponent = (math.log(interval.abs()) / math.ln10).floor();
-  final factor = (interval.abs() / math.pow(10, exponent));
-
-  // Choose a "nice" base interval (1, 2, or 5)
-  double niceInterval;
-  if (factor < 1.5) {
-    niceInterval = 1.0 * math.pow(10, exponent);
-  } else if (factor < 3) {
-    niceInterval = 2.0 * math.pow(10, exponent);
-  } else {
-    niceInterval = 5.0 * math.pow(10, exponent);
-  }
-
-  // Calculate new minimum and maximum values for the intervals
-  final newMinValue = (min / niceInterval).floor() * niceInterval;
-  final newMaxValue = (max / niceInterval).ceil() * niceInterval;
-
-  // Generate tick values
-  final ticks = <double>[];
-  for (var tick = newMinValue; tick <= newMaxValue; tick += niceInterval) {
-    ticks.add(tick);
-  }
-
-  return ticks;
+class AdjustBounds {
+  static BoundingBox noAdjustment(BoundingBox bounds) => bounds;
 }
 
-typedef IntervalsBuilder = List<double> Function(
-  BoundingBox bounds,
-  List<ChartItem> values,
-);
-
-class IntervalsX {
-  static List<double> outline(BoundingBox bounds, List<ChartItem> items) {
-    final values = items.map((item) => item.x);
-    return [values.min, values.max];
-  }
-
-  static List<double> all(BoundingBox bounds, List<ChartItem> items) =>
-      items.map((item) => item.x).toList();
+abstract interface class IntervalsProvider {
+  BoundingBox get adjustedBounds;
+  List<double> get intervals;
 }
 
-class IntervalsY {
-  static List<double> outline(BoundingBox bounds, List<ChartItem> items) {
+class AllXIntervals implements IntervalsProvider {
+  final BoundingBox bounds;
+  final List<ChartItem> items;
+
+  @override
+  BoundingBox get adjustedBounds => bounds;
+
+  @override
+  List<double> get intervals => items.map((item) => item.x).toList();
+
+  const AllXIntervals({required this.bounds, required this.items});
+
+  factory AllXIntervals.create(BoundingBox bounds, List<ChartItem> items) =>
+      AllXIntervals(bounds: bounds, items: items);
+}
+
+class OutlineXIntervals implements IntervalsProvider {
+  final BoundingBox bounds;
+
+  @override
+  BoundingBox get adjustedBounds => bounds;
+
+  @override
+  List<double> get intervals =>
+      [bounds.minX, bounds.maxX].whereNotNull().toList();
+
+  const OutlineXIntervals({required this.bounds});
+
+  factory OutlineXIntervals.create(BoundingBox bounds, List<ChartItem> items) =>
+      OutlineXIntervals(bounds: bounds);
+}
+
+class OutlineYIntervals implements IntervalsProvider {
+  final BoundingBox bounds;
+
+  @override
+  BoundingBox get adjustedBounds => bounds;
+
+  @override
+  List<double> get intervals {
     final min = bounds.minY;
     final max = bounds.maxY;
 
@@ -67,59 +70,75 @@ class IntervalsY {
     return [min, max];
   }
 
-  static IntervalsBuilder rounded({int numberOfTicks = 3}) => (bounds, items) {
-        final min = bounds.minY;
-        final max = bounds.maxY;
+  const OutlineYIntervals({required this.bounds});
 
-        if (min == null || max == null) {
-          return [];
-        }
-
-        return _niceIntervals(min, max, numberOfTicks);
-      };
+  factory OutlineYIntervals.create(BoundingBox bounds, List<ChartItem> items) =>
+      OutlineYIntervals(bounds: bounds);
 }
 
-typedef BoundsAdjuster = BoundingBox Function(BoundingBox bounds);
+class RoundedYIntervals implements IntervalsProvider {
+  final BoundingBox bounds;
+  final int numberOfTicks;
 
-class AdjustBounds {
-  static BoundingBox noAdjustment(BoundingBox bounds) => bounds;
+  final _ticks = <double>[];
 
-  static BoundsAdjuster rounded({
-    bool x = false,
-    bool y = true,
-  }) =>
-      (BoundingBox bounds) {
-        final xAxis = x
-            ? _getRoundedValues(bounds.minX, bounds.maxX)
-            : (bounds.minX, bounds.maxX);
+  @override
+  BoundingBox get adjustedBounds => _ticks.isNotEmpty
+      ? bounds.mergeWith(BoundingBox(minY: _ticks.first, maxY: _ticks.last))
+      : bounds;
 
-        final yAxis = y
-            ? _getRoundedValues(bounds.minY, bounds.maxY)
-            : (bounds.minY, bounds.maxY);
+  @override
+  List<double> get intervals => _ticks;
 
-        return BoundingBox(
-          minX: xAxis.$1,
-          maxX: xAxis.$2,
-          minY: yAxis.$1,
-          maxY: yAxis.$2,
-        );
-      };
-
-  static (double? min, double? max) _getRoundedValues(
-    double? min,
-    double? max,
-  ) {
-    if (min == null || max == null) {
-      // TODO: Can we calculate something if one of them is null?
-      return (min, max);
-    }
-
-    final intervals = _niceIntervals(min, max, 3);
-
-    if (intervals.isEmpty) {
-      return (min, max);
-    }
-
-    return (intervals.first, intervals.last);
+  RoundedYIntervals({required this.bounds, required this.numberOfTicks}) {
+    _generateTicks();
   }
+
+  void _generateTicks() {
+    final min = bounds.minY;
+    final max = bounds.maxY;
+
+    if (min == null || max == null) {
+      return;
+    }
+
+    // Calculate initial interval
+    final interval = (min - max) / numberOfTicks;
+
+    // Determine exponent for rounding
+    final exponent = (math.log(interval.abs()) / math.ln10).floor();
+    final factor = (interval.abs() / math.pow(10, exponent));
+
+    // Choose a "nice" base interval (1, 2, or 5)
+    double niceInterval;
+    if (factor < 1.5) {
+      niceInterval = 1.0 * math.pow(10, exponent);
+    } else if (factor < 3) {
+      niceInterval = 2.0 * math.pow(10, exponent);
+    } else {
+      niceInterval = 5.0 * math.pow(10, exponent);
+    }
+
+    // Calculate new minimum and maximum values for the intervals
+    final newMinValue = (min / niceInterval).floor() * niceInterval;
+    final newMaxValue = (max / niceInterval).ceil() * niceInterval;
+
+    // Generate tick values
+    for (var tick = newMinValue; tick <= newMaxValue; tick += niceInterval) {
+      _ticks.add(tick);
+    }
+  }
+}
+
+class CustomIntervals implements IntervalsProvider {
+  @override
+  final BoundingBox adjustedBounds;
+
+  @override
+  final List<double> intervals;
+
+  const CustomIntervals({
+    required BoundingBox bounds,
+    required this.intervals,
+  }) : adjustedBounds = bounds;
 }

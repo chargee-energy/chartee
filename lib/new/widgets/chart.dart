@@ -19,8 +19,10 @@ class Chart extends StatelessWidget {
   final Labels? topLabels;
   final Labels? bottomLabels;
   final BoundsAdjuster adjustBounds;
-  final IntervalsBuilder intervalsX;
-  final IntervalsBuilder intervalsY;
+  final IntervalsProvider Function(BoundingBox bounds, List<ChartItem> items)
+      xIntervalsProvider;
+  final IntervalsProvider Function(BoundingBox bounds, List<ChartItem> items)
+      yIntervalsProvider;
 
   const Chart({
     super.key,
@@ -30,32 +32,52 @@ class Chart extends StatelessWidget {
     this.topLabels,
     this.bottomLabels,
     this.adjustBounds = AdjustBounds.noAdjustment,
-    this.intervalsX = IntervalsX.outline,
-    this.intervalsY = IntervalsY.outline,
+    this.xIntervalsProvider = OutlineXIntervals.create,
+    this.yIntervalsProvider = OutlineYIntervals.create,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bounds = BoundingBox.merge(layers.map((layer) => layer.bounds));
+    final initialBounds =
+        adjustBounds(BoundingBox.merge(layers.map((layer) => layer.bounds)));
 
     final items = layers
         .whereType<ChartItemLayer>()
         .fold(<ChartItem>[], (result, layer) => [...result, ...layer.items]);
 
-    final intervalsX = this.intervalsX(bounds, items);
-    final intervalsY = this.intervalsY(bounds, items);
-    final adjustedBounds = adjustBounds(bounds);
+    final xIntervals = xIntervalsProvider(initialBounds, items);
+    final yIntervals = yIntervalsProvider(initialBounds, items);
 
-    // TODO: Remove intervals outside of bounds
+    final bounds = BoundingBox.merge(
+      [
+        xIntervals.adjustedBounds,
+        yIntervals.adjustedBounds,
+      ],
+    );
 
-    final topLabelValues =
-        _getLabelValues(topLabels, intervalsX, adjustedBounds.getFractionX);
-    final bottomLabelValues =
-        _getLabelValues(bottomLabels, intervalsX, adjustedBounds.getFractionX);
-    final leftLabelValues =
-        _getLabelValues(leftLabels, intervalsY, adjustedBounds.getFractionY);
-    final rightLabelValues =
-        _getLabelValues(rightLabels, intervalsY, adjustedBounds.getFractionY);
+    final topLabelValues = _getLabelValues(
+      topLabels,
+      xIntervals.intervals,
+      bounds.getFractionX,
+    );
+
+    final bottomLabelValues = _getLabelValues(
+      bottomLabels,
+      xIntervals.intervals,
+      bounds.getFractionX,
+    );
+
+    final leftLabelValues = _getLabelValues(
+      leftLabels,
+      yIntervals.intervals,
+      bounds.getFractionY,
+    );
+
+    final rightLabelValues = _getLabelValues(
+      rightLabels,
+      yIntervals.intervals,
+      bounds.getFractionY,
+    );
 
     // TODO: Don't add padding if there are no values
     final topLabelsHeight =
@@ -77,9 +99,9 @@ class Chart extends StatelessWidget {
       children: [
         ...layers.whereType<ChartGridLayer>().map(
               (layer) => ChartGrid(
-                bounds: adjustedBounds,
-                intervalsX: intervalsX,
-                intervalsY: intervalsY,
+                bounds: bounds,
+                xIntervals: xIntervals.intervals,
+                yIntervals: yIntervals.intervals,
                 horizontalLineBuilder: layer.horizontalLineBuilder,
                 verticalLineBuilder: layer.verticalLineBuilder,
                 padding: EdgeInsets.only(
@@ -117,12 +139,12 @@ class Chart extends StatelessWidget {
                     ),
                   Expanded(
                     child: ChartGestureHandler(
-                      bounds: adjustedBounds,
+                      bounds: bounds,
                       items: items,
                       builder: (context, selectedItems) => ChartLayerStack(
-                        bounds: adjustedBounds,
-                        intervalsX: intervalsX,
-                        intervalsY: intervalsY,
+                        bounds: bounds,
+                        xIntervals: xIntervals.intervals,
+                        yIntervals: yIntervals.intervals,
                         layers: layers,
                         selectedItems: selectedItems,
                       ),

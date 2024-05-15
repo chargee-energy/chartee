@@ -12,16 +12,16 @@ import 'chart_selection.dart';
 
 class ChartLayerStack extends StatelessWidget {
   final BoundingBox bounds;
-  final List<double> intervalsX;
-  final List<double> intervalsY;
+  final List<double> xIntervals;
+  final List<double> yIntervals;
   final List<ChartLayer> layers;
   final List<ChartItem> selectedItems;
 
   const ChartLayerStack({
     super.key,
     required this.bounds,
-    required this.intervalsX,
-    required this.intervalsY,
+    required this.xIntervals,
+    required this.yIntervals,
     required this.layers,
     required this.selectedItems,
   });

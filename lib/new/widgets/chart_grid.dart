@@ -6,8 +6,8 @@ import '../utils/path.dart';
 
 class ChartGrid extends StatelessWidget {
   final BoundingBox bounds;
-  final List<double> intervalsX;
-  final List<double> intervalsY;
+  final List<double> xIntervals;
+  final List<double> yIntervals;
   final GridLineBuilder? horizontalLineBuilder;
   final GridLineBuilder? verticalLineBuilder;
   final EdgeInsets padding;
@@ -15,8 +15,8 @@ class ChartGrid extends StatelessWidget {
   const ChartGrid({
     super.key,
     required this.bounds,
-    required this.intervalsX,
-    required this.intervalsY,
+    required this.xIntervals,
+    required this.yIntervals,
     this.horizontalLineBuilder,
     this.verticalLineBuilder,
     this.padding = EdgeInsets.zero,
@@ -31,7 +31,7 @@ class ChartGrid extends StatelessWidget {
         _GridLinesPainter(
           axis: Axis.horizontal,
           bounds: bounds,
-          intervals: intervalsY,
+          intervals: yIntervals,
           lineBuilder: horizontalLineBuilder,
           padding: padding,
         ),
@@ -43,7 +43,7 @@ class ChartGrid extends StatelessWidget {
         _GridLinesPainter(
           axis: Axis.vertical,
           bounds: bounds,
-          intervals: intervalsX,
+          intervals: xIntervals,
           lineBuilder: verticalLineBuilder,
           padding: padding,
         ),
