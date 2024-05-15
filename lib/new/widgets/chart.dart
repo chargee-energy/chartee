@@ -36,8 +36,7 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bounds =
-        adjustBounds(BoundingBox.merge(layers.map((layer) => layer.bounds)));
+    final bounds = BoundingBox.merge(layers.map((layer) => layer.bounds));
 
     final items = layers
         .whereType<ChartItemLayer>()
@@ -45,15 +44,18 @@ class Chart extends StatelessWidget {
 
     final intervalsX = this.intervalsX(bounds, items);
     final intervalsY = this.intervalsY(bounds, items);
+    final adjustedBounds = adjustBounds(bounds);
+
+    // TODO: Remove intervals outside of bounds
 
     final topLabelValues =
-        _getLabelValues(topLabels, intervalsX, bounds.getFractionX);
+        _getLabelValues(topLabels, intervalsX, adjustedBounds.getFractionX);
     final bottomLabelValues =
-        _getLabelValues(bottomLabels, intervalsX, bounds.getFractionX);
+        _getLabelValues(bottomLabels, intervalsX, adjustedBounds.getFractionX);
     final leftLabelValues =
-        _getLabelValues(leftLabels, intervalsY, bounds.getFractionY);
+        _getLabelValues(leftLabels, intervalsY, adjustedBounds.getFractionY);
     final rightLabelValues =
-        _getLabelValues(rightLabels, intervalsY, bounds.getFractionY);
+        _getLabelValues(rightLabels, intervalsY, adjustedBounds.getFractionY);
 
     // TODO: Don't add padding if there are no values
     final topLabelsHeight =
@@ -75,7 +77,7 @@ class Chart extends StatelessWidget {
       children: [
         ...layers.whereType<ChartGridLayer>().map(
               (layer) => ChartGrid(
-                bounds: bounds,
+                bounds: adjustedBounds,
                 intervalsX: intervalsX,
                 intervalsY: intervalsY,
                 horizontalLineBuilder: layer.horizontalLineBuilder,
@@ -115,10 +117,10 @@ class Chart extends StatelessWidget {
                     ),
                   Expanded(
                     child: ChartGestureHandler(
-                      bounds: bounds,
+                      bounds: adjustedBounds,
                       items: items,
                       builder: (context, selectedItems) => ChartLayerStack(
-                        bounds: bounds,
+                        bounds: adjustedBounds,
                         intervalsX: intervalsX,
                         intervalsY: intervalsY,
                         layers: layers,

@@ -7,12 +7,11 @@ import '../models/chart_item.dart';
 
 List<double> _niceIntervals(double min, double max, int numberOfTicks) {
   // Calculate initial interval
-  final dataRange = max - min;
-  final interval = dataRange / numberOfTicks;
+  final interval = (min - max) / numberOfTicks;
 
   // Determine exponent for rounding
-  final exponent = (math.log(interval) / math.ln10).floor();
-  final factor = interval / math.pow(10, exponent);
+  final exponent = (math.log(interval.abs()) / math.ln10).floor();
+  final factor = (interval.abs() / math.pow(10, exponent));
 
   // Choose a "nice" base interval (1, 2, or 5)
   double niceInterval;
@@ -24,13 +23,13 @@ List<double> _niceIntervals(double min, double max, int numberOfTicks) {
     niceInterval = 5.0 * math.pow(10, exponent);
   }
 
-  // Recalculate tick range
-  final startTick = (min / niceInterval).floor() * niceInterval;
-  final endTick = (max / niceInterval).ceil() * niceInterval;
+  // Calculate new minimum and maximum values for the intervals
+  final newMinValue = (min / niceInterval).floor() * niceInterval;
+  final newMaxValue = (max / niceInterval).ceil() * niceInterval;
 
   // Generate tick values
   final ticks = <double>[];
-  for (var tick = startTick; tick <= endTick; tick += niceInterval) {
+  for (var tick = newMinValue; tick <= newMaxValue; tick += niceInterval) {
     ticks.add(tick);
   }
 
