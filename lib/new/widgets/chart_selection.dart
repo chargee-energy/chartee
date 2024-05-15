@@ -71,7 +71,10 @@ class _ChartSelectionState extends State<ChartSelection> {
       final centerX = widget.bounds.getFractionX(_items.first.x) * width;
 
       final left = (centerX - tooltipBox.size.width / 2)
-          .clamp(0, width - tooltipBox.size.width)
+          .clamp(
+            -widget.padding.left,
+            parentBox.size.width - tooltipBox.size.width,
+          )
           .toDouble();
 
       final tooltipCenterX = left + tooltipBox.size.width / 2;
