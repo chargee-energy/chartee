@@ -10,6 +10,7 @@ class ChartGrid extends StatelessWidget {
   final List<double> intervalsY;
   final GridLineBuilder? horizontalLineBuilder;
   final GridLineBuilder? verticalLineBuilder;
+  final EdgeInsets padding;
 
   const ChartGrid({
     super.key,
@@ -18,6 +19,7 @@ class ChartGrid extends StatelessWidget {
     required this.intervalsY,
     this.horizontalLineBuilder,
     this.verticalLineBuilder,
+    this.padding = EdgeInsets.zero,
   });
 
   @override
@@ -31,6 +33,7 @@ class ChartGrid extends StatelessWidget {
           bounds: bounds,
           intervals: intervalsY,
           lineBuilder: horizontalLineBuilder,
+          padding: padding,
         ),
       );
     }
@@ -42,6 +45,7 @@ class ChartGrid extends StatelessWidget {
           bounds: bounds,
           intervals: intervalsX,
           lineBuilder: verticalLineBuilder,
+          padding: padding,
         ),
       );
     }
@@ -72,12 +76,14 @@ class _GridLinesPainter extends CustomPainter {
   final BoundingBox bounds;
   final List<double> intervals;
   final GridLineBuilder lineBuilder;
+  final EdgeInsets padding;
 
   _GridLinesPainter({
     required this.axis,
     required this.bounds,
     required this.intervals,
     required this.lineBuilder,
+    required this.padding,
   });
 
   @override
@@ -101,14 +107,26 @@ class _GridLinesPainter extends CustomPainter {
 
         switch (axis) {
           case Axis.horizontal:
-            final y = size.height * bounds.getFractionY(intervals[i]);
-            path.moveTo(0, y);
-            path.lineTo(size.width, y);
+            final y = padding.top +
+                (size.height - padding.vertical) *
+                    bounds.getFractionY(intervals[i]);
+
+            path.moveTo(line.extendBehindLabels ? 0 : padding.left, y);
+            path.lineTo(
+              line.extendBehindLabels ? size.width : size.width - padding.right,
+              y,
+            );
             break;
           case Axis.vertical:
-            final x = size.width * bounds.getFractionX(intervals[i]);
-            path.moveTo(x, 0);
-            path.lineTo(x, size.height);
+            final x = padding.left +
+                (size.width - padding.horizontal) *
+                    bounds.getFractionX(intervals[i]);
+
+            path.moveTo(x, line.extendBehindLabels ? 0 : padding.top);
+            path.lineTo(
+              x,
+              line.extendBehindLabels ? size.height : size.height - padding.top,
+            );
             break;
         }
 

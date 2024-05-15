@@ -7,7 +7,6 @@ import '../models/chart_layer.dart';
 import 'chart_area.dart';
 import 'chart_bars.dart';
 import 'chart_cursor.dart';
-import 'chart_grid.dart';
 import 'chart_line.dart';
 import 'chart_selection.dart';
 
@@ -34,17 +33,7 @@ class ChartLayerStack extends StatelessWidget {
       children: layers
           .map(
             (layer) => switch (layer) {
-              ChartGridLayer(
-                :final horizontalLineBuilder,
-                :final verticalLineBuilder,
-              ) =>
-                ChartGrid(
-                  bounds: bounds,
-                  intervalsX: intervalsX,
-                  intervalsY: intervalsY,
-                  horizontalLineBuilder: horizontalLineBuilder,
-                  verticalLineBuilder: verticalLineBuilder,
-                ),
+              ChartGridLayer() => const SizedBox.shrink(),
               ChartSelectionLayer(
                 :final builder,
                 :final sticky,

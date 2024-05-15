@@ -7,6 +7,7 @@ import '../models/chart_layer.dart';
 import '../models/labels.dart';
 import '../utils/chart.dart';
 import 'chart_gesture_handler.dart';
+import 'chart_grid.dart';
 import 'chart_layer_stack.dart';
 import 'chart_x_labels.dart';
 import 'chart_y_labels.dart';
@@ -54,6 +55,7 @@ class Chart extends StatelessWidget {
     final rightLabelValues =
         _getLabelValues(rightLabels, intervalsY, bounds.getFractionY);
 
+    // TODO: Don't add padding if there are no values
     final topLabelsHeight =
         (topLabelValues?.map((value) => value.painter.height).maxOrNull ?? 0) +
             (topLabels?.padding.vertical ?? 0);
@@ -61,63 +63,93 @@ class Chart extends StatelessWidget {
         (bottomLabelValues?.map((value) => value.painter.height).maxOrNull ??
                 0) +
             (bottomLabels?.padding.vertical ?? 0);
+    final leftLabelsWidth =
+        (leftLabelValues?.map((value) => value.painter.width).maxOrNull ?? 0) +
+            (leftLabels?.padding.horizontal ?? 0);
+    final rightLabelsWidth =
+        (rightLabelValues?.map((value) => value.painter.width).maxOrNull ?? 0) +
+            (rightLabels?.padding.horizontal ?? 0);
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Stack(
+      fit: StackFit.expand,
       children: [
-        if (leftLabels case final leftLabels? when leftLabelValues != null)
-          Padding(
-            padding: EdgeInsets.only(
-              top: topLabelsHeight,
-              bottom: bottomLabelsHeight,
-            ),
-            child: ChartYLabels(
-              labels: leftLabels,
-              values: leftLabelValues,
-            ),
-          ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (topLabels case final topLabels? when topLabelValues != null)
-                ChartXLabels(
-                  labels: topLabels,
-                  values: topLabelValues,
-                ),
-              Expanded(
-                child: ChartGestureHandler(
-                  bounds: bounds,
-                  items: items,
-                  builder: (context, selectedItems) => ChartLayerStack(
-                    bounds: bounds,
-                    intervalsX: intervalsX,
-                    intervalsY: intervalsY,
-                    layers: layers,
-                    selectedItems: selectedItems,
-                  ),
+        ...layers.whereType<ChartGridLayer>().map(
+              (layer) => ChartGrid(
+                bounds: bounds,
+                intervalsX: intervalsX,
+                intervalsY: intervalsY,
+                horizontalLineBuilder: layer.horizontalLineBuilder,
+                verticalLineBuilder: layer.verticalLineBuilder,
+                padding: EdgeInsets.only(
+                  top: topLabelsHeight,
+                  bottom: bottomLabelsHeight,
+                  left: leftLabelsWidth,
+                  right: rightLabelsWidth,
                 ),
               ),
-              if (bottomLabels case final bottomLabels?
-                  when bottomLabelValues != null)
-                ChartXLabels(
-                  labels: bottomLabels,
-                  values: bottomLabelValues,
+            ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (leftLabels case final leftLabels?
+                when leftLabelValues != null && leftLabelValues.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(
+                  top: topLabelsHeight,
+                  bottom: bottomLabelsHeight,
                 ),
-            ],
-          ),
+                child: ChartYLabels(
+                  labels: leftLabels,
+                  values: leftLabelValues,
+                ),
+              ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (topLabels case final topLabels?
+                      when topLabelValues != null && topLabelValues.isNotEmpty)
+                    ChartXLabels(
+                      labels: topLabels,
+                      values: topLabelValues,
+                    ),
+                  Expanded(
+                    child: ChartGestureHandler(
+                      bounds: bounds,
+                      items: items,
+                      builder: (context, selectedItems) => ChartLayerStack(
+                        bounds: bounds,
+                        intervalsX: intervalsX,
+                        intervalsY: intervalsY,
+                        layers: layers,
+                        selectedItems: selectedItems,
+                      ),
+                    ),
+                  ),
+                  if (bottomLabels case final bottomLabels?
+                      when bottomLabelValues != null &&
+                          bottomLabelValues.isNotEmpty)
+                    ChartXLabels(
+                      labels: bottomLabels,
+                      values: bottomLabelValues,
+                    ),
+                ],
+              ),
+            ),
+            if (rightLabels case final rightLabels?
+                when rightLabelValues != null && rightLabelValues.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(
+                  top: topLabelsHeight,
+                  bottom: bottomLabelsHeight,
+                ),
+                child: ChartYLabels(
+                  labels: rightLabels,
+                  values: rightLabelValues,
+                ),
+              ),
+          ],
         ),
-        if (rightLabels case final rightLabels? when rightLabelValues != null)
-          Padding(
-            padding: EdgeInsets.only(
-              top: topLabelsHeight,
-              bottom: bottomLabelsHeight,
-            ),
-            child: ChartYLabels(
-              labels: rightLabels,
-              values: rightLabelValues,
-            ),
-          ),
       ],
     );
   }
