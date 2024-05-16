@@ -127,6 +127,10 @@ class BoundingBox with EquatableMixin {
   /// Throws [UnboundedError] if X bounds are not set.
   double getFractionX(double x) {
     if (this case BoundingBox(:final minX?, :final maxX?)) {
+      if (minX == maxX) {
+        return 0;
+      }
+
       return (x - minX) / (maxX - minX);
     }
 
@@ -140,6 +144,10 @@ class BoundingBox with EquatableMixin {
   /// Throws [UnboundedError] if Y bounds are not set.
   double getFractionY(double y) {
     if (this case BoundingBox(:final minY?, :final maxY?)) {
+      if (minY == maxY) {
+        return 0;
+      }
+
       return 1 - (y - minY) / (maxY - minY);
     }
 
