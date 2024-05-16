@@ -15,6 +15,7 @@ import 'chart_y_labels.dart';
 
 class Chart extends StatelessWidget {
   final List<ChartLayer> layers;
+  final EdgeInsets padding;
   final Labels? leftLabels;
   final Labels? rightLabels;
   final Labels? topLabels;
@@ -29,6 +30,7 @@ class Chart extends StatelessWidget {
   const Chart({
     super.key,
     required this.layers,
+    this.padding = EdgeInsets.zero,
     this.leftLabels,
     this.rightLabels,
     this.topLabels,
@@ -88,20 +90,21 @@ class Chart extends StatelessWidget {
     final leftLabelsSize = _getLargestLabelSize(leftLabels, leftLabelValues);
     final rightLabelsSize = _getLargestLabelSize(rightLabels, rightLabelValues);
 
-    final padding = EdgeInsets.fromLTRB(
-      leftLabelsSize.width,
-      topLabelsSize.height,
-      rightLabelsSize.width,
-      bottomLabelsSize.height,
-    );
+    final contentPadding = padding +
+        EdgeInsets.fromLTRB(
+          leftLabelsSize.width,
+          topLabelsSize.height,
+          rightLabelsSize.width,
+          bottomLabelsSize.height,
+        );
 
     return ChartGestureHandler(
-      padding: padding,
+      padding: contentPadding,
       bounds: intervalsAdjustedBounds,
       items: items,
       onSelectionChanged: onSelectionChanged,
       builder: (context, selectedItems) => ChartLayerStack(
-        padding: padding,
+        padding: contentPadding,
         bounds: intervalsAdjustedBounds,
         xIntervals: xIntervals.intervals,
         yIntervals: yIntervals.intervals,
@@ -111,8 +114,8 @@ class Chart extends StatelessWidget {
           if (topLabels case final labels?
               when topLabelValues != null && topLabelValues.isNotEmpty)
             Positioned(
-              left: leftLabelsSize.width,
-              right: rightLabelsSize.width,
+              left: padding.left + leftLabelsSize.width,
+              right: padding.right + rightLabelsSize.width,
               top: labels.padding.top,
               height: topLabelsSize.height - labels.padding.vertical,
               child: ChartXLabels(
@@ -123,8 +126,8 @@ class Chart extends StatelessWidget {
           if (bottomLabels case final labels?
               when bottomLabelValues != null && bottomLabelValues.isNotEmpty)
             Positioned(
-              left: leftLabelsSize.width,
-              right: rightLabelsSize.width,
+              left: padding.left + leftLabelsSize.width,
+              right: padding.right + rightLabelsSize.width,
               bottom: labels.padding.bottom,
               height: bottomLabelsSize.height - labels.padding.vertical,
               child: ChartXLabels(
@@ -135,8 +138,8 @@ class Chart extends StatelessWidget {
           if (leftLabels case final labels?
               when leftLabelValues != null && leftLabelValues.isNotEmpty)
             Positioned(
-              top: topLabelsSize.height,
-              bottom: bottomLabelsSize.height,
+              top: padding.top + topLabelsSize.height,
+              bottom: padding.bottom + bottomLabelsSize.height,
               left: labels.padding.left,
               width: leftLabelsSize.width - labels.padding.horizontal,
               child: ChartYLabels(
@@ -147,8 +150,8 @@ class Chart extends StatelessWidget {
           if (rightLabels case final labels?
               when rightLabelValues != null && rightLabelValues.isNotEmpty)
             Positioned(
-              top: topLabelsSize.height,
-              bottom: bottomLabelsSize.height,
+              top: padding.top + topLabelsSize.height,
+              bottom: padding.bottom + bottomLabelsSize.height,
               right: labels.padding.right,
               width: rightLabelsSize.width - labels.padding.horizontal,
               child: ChartYLabels(
