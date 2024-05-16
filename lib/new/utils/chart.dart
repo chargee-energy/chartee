@@ -105,6 +105,11 @@ class RoundedYIntervals implements IntervalsProvider {
     // Calculate initial interval
     final interval = (min - max) / numberOfTicks;
 
+    if (interval == 0) {
+      // TODO: Should we put ticks?
+      return;
+    }
+
     // Determine exponent for rounding
     final exponent = (math.log(interval.abs()) / math.ln10).floor();
     final factor = (interval.abs() / math.pow(10, exponent));

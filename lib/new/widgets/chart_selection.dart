@@ -65,20 +65,20 @@ class _ChartSelectionState extends State<ChartSelection> {
   void _updatePosition() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final parentBox = context.findRenderObject()?.parent as RenderBox;
-      final tooltipBox = _key.currentContext?.findRenderObject() as RenderBox;
+      final selectionBox = _key.currentContext?.findRenderObject() as RenderBox;
 
       final width = parentBox.size.width - widget.padding.horizontal;
       final centerX = widget.bounds.getFractionX(_items.first.x) * width;
 
-      final left = (centerX - tooltipBox.size.width / 2)
+      final left = (centerX - selectionBox.size.width / 2)
           .clamp(
             -widget.padding.left,
-            parentBox.size.width - tooltipBox.size.width,
+            parentBox.size.width - selectionBox.size.width,
           )
           .toDouble();
 
-      final tooltipCenterX = left + tooltipBox.size.width / 2;
-      final arrowOffsetX = centerX - tooltipCenterX;
+      final selectionCenterX = left + selectionBox.size.width / 2;
+      final arrowOffsetX = centerX - selectionCenterX;
 
       setState(() {
         _offstage = false;
