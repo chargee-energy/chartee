@@ -51,7 +51,6 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
     return distances
         .map((distance) => distance.item)
         .where((item) => item.x == distances.first.item.x)
-        .toSet()
         .toList();
   }
 
