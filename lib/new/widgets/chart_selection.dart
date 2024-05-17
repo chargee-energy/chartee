@@ -33,7 +33,7 @@ class _ChartSelectionState extends State<ChartSelection> {
 
   bool _offstage = true;
   double _offsetLeft = 0;
-  double _arrowOffset = 0;
+  double _centerOffset = 0;
 
   @override
   void initState() {
@@ -68,22 +68,24 @@ class _ChartSelectionState extends State<ChartSelection> {
       final selectionBox = _key.currentContext?.findRenderObject() as RenderBox;
 
       final width = parentBox.size.width - widget.padding.horizontal;
-      final centerX = widget.bounds.getFractionX(_items.first.x) * width;
+      final center = widget.bounds.getFractionX(_items.first.x) * width;
 
-      final left = (centerX - selectionBox.size.width / 2)
+      final left = (center - selectionBox.size.width / 2)
           .clamp(
             -widget.padding.left,
-            parentBox.size.width - selectionBox.size.width,
+            parentBox.size.width -
+                selectionBox.size.width -
+                widget.padding.left,
           )
           .toDouble();
 
-      final selectionCenterX = left + selectionBox.size.width / 2;
-      final arrowOffsetX = centerX - selectionCenterX;
+      final selectionCenter = left + selectionBox.size.width / 2;
+      final arrowOffset = center - selectionCenter;
 
       setState(() {
         _offstage = false;
         _offsetLeft = left;
-        _arrowOffset = arrowOffsetX;
+        _centerOffset = arrowOffset;
       });
     });
   }
@@ -99,7 +101,7 @@ class _ChartSelectionState extends State<ChartSelection> {
           offstage: _offstage,
           child: Container(
             key: _key,
-            child: widget.builder(context, widget.items, _arrowOffset),
+            child: widget.builder(context, widget.items, _centerOffset),
           ),
         ),
       );

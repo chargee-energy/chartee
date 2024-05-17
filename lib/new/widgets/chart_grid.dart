@@ -125,7 +125,9 @@ class _GridLinesPainter extends CustomPainter {
             path.moveTo(x, line.extendBehindLabels ? 0 : padding.top);
             path.lineTo(
               x,
-              line.extendBehindLabels ? size.height : size.height - padding.top,
+              line.extendBehindLabels
+                  ? size.height
+                  : size.height - padding.bottom,
             );
             break;
         }
