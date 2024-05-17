@@ -47,6 +47,7 @@ class ChartGridLayer extends ChartLayer {
 
 class ChartSelectionLayer extends ChartLayer {
   final SelectionBuilder builder;
+  final bool containWithinParent;
   final bool sticky;
   final List<ChartItem> initialItems;
 
@@ -55,12 +56,19 @@ class ChartSelectionLayer extends ChartLayer {
 
   const ChartSelectionLayer({
     required this.builder,
+    this.containWithinParent = false,
     this.sticky = false,
     this.initialItems = const [],
   });
 
   @override
-  List<Object?> get props => [...super.props, builder, sticky, initialItems];
+  List<Object?> get props => [
+        ...super.props,
+        containWithinParent,
+        builder,
+        sticky,
+        initialItems,
+      ];
 }
 
 sealed class ChartItemLayer<Item extends ChartItem> extends ChartLayer {

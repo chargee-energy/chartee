@@ -10,6 +10,7 @@ class ChartSelection extends StatefulWidget {
   final List<ChartItem> items;
   final List<ChartItem> initialItems;
   final SelectionBuilder builder;
+  final bool containWithinParent;
   final bool sticky;
 
   const ChartSelection({
@@ -19,6 +20,7 @@ class ChartSelection extends StatefulWidget {
     required this.items,
     required this.initialItems,
     required this.builder,
+    required this.containWithinParent,
     required this.sticky,
   });
 
@@ -64,6 +66,7 @@ class _ChartSelectionState extends State<ChartSelection> {
           padding: widget.padding,
           bounds: widget.bounds,
           items: _items,
+          containWithinParent: widget.containWithinParent,
         ),
         child: widget.builder(context, widget.items, 0),
       ),
@@ -75,18 +78,21 @@ class _SelectionChildLayoutDelegate extends SingleChildLayoutDelegate {
   final EdgeInsets padding;
   final BoundingBox bounds;
   final List<ChartItem> items;
+  final bool containWithinParent;
 
   const _SelectionChildLayoutDelegate({
     required this.padding,
     required this.bounds,
     required this.items,
+    required this.containWithinParent,
   });
 
   @override
   bool shouldRelayout(covariant _SelectionChildLayoutDelegate oldDelegate) =>
       padding != oldDelegate.padding ||
       bounds != oldDelegate.bounds ||
-      items != oldDelegate.items;
+      items != oldDelegate.items ||
+      containWithinParent != oldDelegate.containWithinParent;
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
@@ -97,12 +103,16 @@ class _SelectionChildLayoutDelegate extends SingleChildLayoutDelegate {
     final width = size.width - padding.horizontal;
     final center = bounds.getFractionX(items.first.x) * width;
 
-    final left = (center - childSize.width / 2)
-        .clamp(
-          -padding.left,
-          size.width - childSize.width - padding.left,
-        )
-        .toDouble();
+    var left = (center - childSize.width / 2);
+
+    if (containWithinParent) {
+      left = left
+          .clamp(
+            -padding.left,
+            size.width - childSize.width - padding.left,
+          )
+          .toDouble();
+    }
 
     final selectionCenter = left + childSize.width / 2;
     final centerOffset = center - selectionCenter;

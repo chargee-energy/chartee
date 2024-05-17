@@ -53,6 +53,7 @@ class ChartLayerStack extends StatelessWidget {
               ),
             ChartSelectionLayer(
               :final builder,
+                :final containWithinParent,
               :final sticky,
               :final initialItems,
             ) =>
@@ -60,9 +61,10 @@ class ChartLayerStack extends StatelessWidget {
                 padding: padding,
                 bounds: bounds,
                 items: selectedItems,
+                  initialItems: initialItems,
                 builder: builder,
+                  containWithinParent: containWithinParent,
                 sticky: sticky,
-                initialItems: initialItems,
               ),
             ChartLineLayer(
               :final items,
