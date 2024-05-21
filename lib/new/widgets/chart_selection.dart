@@ -68,7 +68,7 @@ class _ChartSelectionState extends State<ChartSelection> {
           items: _items,
           containWithinParent: widget.containWithinParent,
         ),
-        child: widget.builder(context, widget.items, 0),
+        child: widget.builder(context, widget.items),
       ),
     );
   }
