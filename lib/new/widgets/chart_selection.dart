@@ -63,38 +63,40 @@ class _ChartSelectionState extends State<ChartSelection> {
     final overlay = widget.builder(_items);
     final fraction = widget.bounds.getFractionX(_items.first.x);
 
-    return Padding(
-      padding: EdgeInsets.only(
-        top: widget.padding.top,
-        bottom: widget.padding.bottom,
+    return RepaintBoundary(
+      child: Padding(
+        padding: EdgeInsets.only(
+          top: widget.padding.top,
+          bottom: widget.padding.bottom,
+        ),
+        child: switch (overlay) {
+          SingleChildSelectionOverlay(:final child) => CustomSingleChildLayout(
+              delegate: _SingleChildLayoutDelegate(
+                padding: widget.padding,
+                fraction: fraction,
+                translation: widget.translation,
+                containWithinParent: child.containWithinParent,
+              ),
+              child: child.widget,
+            ),
+          ColumnSelectionOverlay(:final children) => CustomMultiChildLayout(
+              delegate: _ColumnLayoutDelegate(
+                padding: widget.padding,
+                fraction: fraction,
+                translation: widget.translation,
+                children: children,
+              ),
+              children: children
+                  .mapIndexed(
+                    (index, child) => LayoutId(
+                      id: index,
+                      child: child.widget,
+                    ),
+                  )
+                  .toList(),
+            ),
+        },
       ),
-      child: switch (overlay) {
-        SingleChildSelectionOverlay(:final child) => CustomSingleChildLayout(
-            delegate: _SingleChildLayoutDelegate(
-              padding: widget.padding,
-              fraction: fraction,
-              translation: widget.translation,
-              containWithinParent: child.containWithinParent,
-            ),
-            child: child.widget,
-          ),
-        ColumnSelectionOverlay(:final children) => CustomMultiChildLayout(
-            delegate: _ColumnLayoutDelegate(
-              padding: widget.padding,
-              fraction: fraction,
-              translation: widget.translation,
-              children: children,
-            ),
-            children: children
-                .mapIndexed(
-                  (index, child) => LayoutId(
-                    id: index,
-                    child: child.widget,
-                  ),
-                )
-                .toList(),
-          ),
-      },
     );
   }
 }

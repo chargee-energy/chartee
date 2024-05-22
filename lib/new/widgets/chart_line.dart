@@ -26,16 +26,14 @@ class ChartLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: CustomPaint(
-        painter: _LinePainter(
-          bounds: bounds,
-          points: points,
-          positiveColor: positiveColor,
-          negativeColor: negativeColor,
-          lineWidth: lineWidth,
-          dashArray: dashArray,
-        ),
+    return CustomPaint(
+      painter: _LinePainter(
+        bounds: bounds,
+        points: points,
+        positiveColor: positiveColor,
+        negativeColor: negativeColor,
+        lineWidth: lineWidth,
+        dashArray: dashArray,
       ),
     );
   }
