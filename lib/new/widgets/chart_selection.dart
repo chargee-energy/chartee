@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/bounding_box.dart';
@@ -91,7 +92,7 @@ class _SelectionChildLayoutDelegate extends SingleChildLayoutDelegate {
   bool shouldRelayout(covariant _SelectionChildLayoutDelegate oldDelegate) =>
       padding != oldDelegate.padding ||
       bounds != oldDelegate.bounds ||
-      items != oldDelegate.items ||
+      !listEquals(items, oldDelegate.items) ||
       containWithinParent != oldDelegate.containWithinParent;
 
   @override

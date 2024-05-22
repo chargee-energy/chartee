@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/labels.dart';
@@ -33,7 +34,7 @@ class _LabelsPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _LabelsPainter oldDelegate) =>
-      values != oldDelegate.values ||
+      !listEquals(values, oldDelegate.values) ||
       textAlign != oldDelegate.textAlign ||
       offset != oldDelegate.offset;
 

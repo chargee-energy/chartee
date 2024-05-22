@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/bounding_box.dart';
@@ -53,7 +54,7 @@ class _AreaPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _AreaPainter oldDelegate) =>
       bounds != oldDelegate.bounds ||
-      points != oldDelegate.points ||
+      !listEquals(points, oldDelegate.points) ||
       positiveColor != oldDelegate.positiveColor ||
       negativeColor != oldDelegate.negativeColor;
 

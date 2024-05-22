@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/bounding_box.dart';
@@ -70,11 +71,11 @@ class _LinePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _LinePainter oldDelegate) =>
       bounds != oldDelegate.bounds ||
-      points != oldDelegate.points ||
+      !listEquals(points, oldDelegate.points) ||
       positiveColor != oldDelegate.positiveColor ||
       negativeColor != oldDelegate.negativeColor ||
       lineWidth != oldDelegate.lineWidth ||
-      dashArray != oldDelegate.dashArray;
+      !listEquals(dashArray, oldDelegate.dashArray);
 
   @override
   void paint(Canvas canvas, Size size) {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/bounding_box.dart';
@@ -61,7 +62,7 @@ class _GridPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _GridPainter oldDelegate) =>
-      children != oldDelegate.children;
+      !listEquals(children, oldDelegate.children);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -90,7 +91,7 @@ class _GridLinesPainter extends CustomPainter {
   bool shouldRepaint(covariant _GridLinesPainter oldDelegate) =>
       axis != oldDelegate.axis ||
       bounds != oldDelegate.bounds ||
-      intervals != oldDelegate.intervals ||
+      listEquals(intervals, oldDelegate.intervals) ||
       lineBuilder != oldDelegate.lineBuilder;
 
   @override
