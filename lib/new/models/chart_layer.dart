@@ -8,7 +8,7 @@ import 'chart_item.dart';
 import 'cursor_builder.dart';
 import 'point.dart';
 import 'grid_line.dart';
-import 'selection_builder.dart';
+import 'selection_overlay_builder.dart';
 
 sealed class ChartLayer with EquatableMixin {
   BoundingBox get bounds;
@@ -46,8 +46,7 @@ class ChartGridLayer extends ChartLayer {
 }
 
 class ChartSelectionLayer extends ChartLayer {
-  final SelectionBuilder builder;
-  final bool containWithinParent;
+  final SelectionOverlayBuilder builder;
   final bool sticky;
   final List<ChartItem> initialItems;
 
@@ -56,7 +55,6 @@ class ChartSelectionLayer extends ChartLayer {
 
   const ChartSelectionLayer({
     required this.builder,
-    this.containWithinParent = false,
     this.sticky = false,
     this.initialItems = const [],
   });
@@ -64,7 +62,6 @@ class ChartSelectionLayer extends ChartLayer {
   @override
   List<Object?> get props => [
         ...super.props,
-        containWithinParent,
         builder,
         sticky,
         initialItems,

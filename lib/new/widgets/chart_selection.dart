@@ -1,17 +1,19 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
-import '../models/selection_builder.dart';
+import '../models/selection_overlay.dart';
+import '../models/selection_overlay_builder.dart';
+import '../models/selection_overlay_item.dart';
 
 class ChartSelection extends StatefulWidget {
   final EdgeInsets padding;
   final BoundingBox bounds;
   final List<ChartItem> items;
   final List<ChartItem> initialItems;
-  final SelectionBuilder builder;
-  final bool containWithinParent;
+  final SelectionOverlayBuilder builder;
   final bool sticky;
 
   const ChartSelection({
@@ -21,7 +23,6 @@ class ChartSelection extends StatefulWidget {
     required this.items,
     required this.initialItems,
     required this.builder,
-    required this.containWithinParent,
     required this.sticky,
   });
 
@@ -57,42 +58,58 @@ class _ChartSelectionState extends State<ChartSelection> {
       return const SizedBox.shrink();
     }
 
+    final overlay = widget.builder(_items);
+    final fraction = widget.bounds.getFractionX(_items.first.x);
+
     return Padding(
       padding: EdgeInsets.only(
         top: widget.padding.top,
         bottom: widget.padding.bottom,
       ),
-      child: CustomSingleChildLayout(
-        delegate: _SelectionChildLayoutDelegate(
-          padding: widget.padding,
-          bounds: widget.bounds,
-          items: _items,
-          containWithinParent: widget.containWithinParent,
-        ),
-        child: widget.builder(context, widget.items),
-      ),
+      child: switch (overlay) {
+        SingleChildSelectionOverlay(:final child) => CustomSingleChildLayout(
+            delegate: _SingleChildLayoutDelegate(
+              padding: widget.padding,
+              fraction: fraction,
+              containWithinParent: child.containWithinParent,
+            ),
+            child: child.widget,
+          ),
+        ColumnSelectionOverlay(:final children) => CustomMultiChildLayout(
+            delegate: _ColumnLayoutDelegate(
+              padding: widget.padding,
+              fraction: fraction,
+              children: children,
+            ),
+            children: children
+                .mapIndexed(
+                  (index, child) => LayoutId(
+                    id: index,
+                    child: child.widget,
+                  ),
+                )
+                .toList(),
+          ),
+      },
     );
   }
 }
 
-class _SelectionChildLayoutDelegate extends SingleChildLayoutDelegate {
+class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
   final EdgeInsets padding;
-  final BoundingBox bounds;
-  final List<ChartItem> items;
+  final double fraction;
   final bool containWithinParent;
 
-  const _SelectionChildLayoutDelegate({
+  const _SingleChildLayoutDelegate({
     required this.padding,
-    required this.bounds,
-    required this.items,
+    required this.fraction,
     required this.containWithinParent,
   });
 
   @override
-  bool shouldRelayout(covariant _SelectionChildLayoutDelegate oldDelegate) =>
+  bool shouldRelayout(covariant _SingleChildLayoutDelegate oldDelegate) =>
       padding != oldDelegate.padding ||
-      bounds != oldDelegate.bounds ||
-      !listEquals(items, oldDelegate.items) ||
+      fraction != oldDelegate.fraction ||
       containWithinParent != oldDelegate.containWithinParent;
 
   @override
@@ -100,24 +117,66 @@ class _SelectionChildLayoutDelegate extends SingleChildLayoutDelegate {
       BoxConstraints.loose(constraints.smallest);
 
   @override
-  Offset getPositionForChild(Size size, Size childSize) {
-    final width = size.width - padding.horizontal;
-    final center = bounds.getFractionX(items.first.x) * width;
+  Offset getPositionForChild(Size size, Size childSize) =>
+      _getOffset(size, childSize, fraction, containWithinParent, padding);
+}
 
-    var left = (center - childSize.width / 2);
+class _ColumnLayoutDelegate extends MultiChildLayoutDelegate {
+  final EdgeInsets padding;
+  final double fraction;
+  final List<SelectionOverlayItem> children;
 
-    if (containWithinParent) {
-      left = left
-          .clamp(
-            -padding.left,
-            size.width - childSize.width - padding.left,
-          )
-          .toDouble();
+  _ColumnLayoutDelegate({
+    required this.padding,
+    required this.fraction,
+    required this.children,
+  });
+
+  @override
+  bool shouldRelayout(covariant _ColumnLayoutDelegate oldDelegate) =>
+      padding != oldDelegate.padding ||
+      fraction != oldDelegate.fraction ||
+      !listEquals(children, oldDelegate.children);
+
+  @override
+  void performLayout(Size size) {
+    var offsetTop = 0.0;
+
+    for (var index = 0; index < children.length; index++) {
+      final childSize = layoutChild(index, BoxConstraints.loose(size));
+      final containWithinParent = children[index].containWithinParent;
+
+      positionChild(
+        index,
+        _getOffset(size, childSize, fraction, containWithinParent, padding) +
+            Offset(0, offsetTop),
+      );
+
+      offsetTop += childSize.height;
     }
-
-    final selectionCenter = left + childSize.width / 2;
-    final centerOffset = center - selectionCenter;
-
-    return Offset(padding.left + left, 0);
   }
+}
+
+Offset _getOffset(
+  Size size,
+  Size childSize,
+  double fraction,
+  bool containWithinParent,
+  EdgeInsets padding,
+) {
+  final width = size.width - padding.horizontal;
+  final center = fraction * width;
+
+  var left = (center - childSize.width / 2);
+
+  if (containWithinParent) {
+    left = left
+        .clamp(
+          -padding.left,
+          size.width - childSize.width - padding.left,
+        )
+        .toDouble();
+  }
+
+  return Offset(padding.left + left, 0);
 }

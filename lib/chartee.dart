@@ -31,6 +31,8 @@ export 'new/models/chart_layer.dart';
 export 'new/models/grid_line.dart';
 export 'new/models/labels.dart';
 export 'new/models/point.dart';
+export 'new/models/selection_overlay_item.dart';
+export 'new/models/selection_overlay.dart';
 
 export 'new/utils/chart.dart';
 
