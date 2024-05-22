@@ -54,6 +54,7 @@ class ChartLayerStack extends StatelessWidget {
             ChartSelectionLayer(
               :final builder,
               :final sticky,
+              :final translation,
               :final initialItems,
             ) =>
               ChartSelection(
@@ -63,6 +64,7 @@ class ChartLayerStack extends StatelessWidget {
                 initialItems: initialItems,
                 builder: builder,
                 sticky: sticky,
+                translation: translation,
               ),
             ChartLineLayer(
               :final items,

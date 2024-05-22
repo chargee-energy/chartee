@@ -15,6 +15,7 @@ class ChartSelection extends StatefulWidget {
   final List<ChartItem> initialItems;
   final SelectionOverlayBuilder builder;
   final bool sticky;
+  final double translation;
 
   const ChartSelection({
     super.key,
@@ -24,6 +25,7 @@ class ChartSelection extends StatefulWidget {
     required this.initialItems,
     required this.builder,
     required this.sticky,
+    required this.translation,
   });
 
   @override
@@ -71,6 +73,7 @@ class _ChartSelectionState extends State<ChartSelection> {
             delegate: _SingleChildLayoutDelegate(
               padding: widget.padding,
               fraction: fraction,
+              translation: widget.translation,
               containWithinParent: child.containWithinParent,
             ),
             child: child.widget,
@@ -79,6 +82,7 @@ class _ChartSelectionState extends State<ChartSelection> {
             delegate: _ColumnLayoutDelegate(
               padding: widget.padding,
               fraction: fraction,
+              translation: widget.translation,
               children: children,
             ),
             children: children
@@ -98,11 +102,13 @@ class _ChartSelectionState extends State<ChartSelection> {
 class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
   final EdgeInsets padding;
   final double fraction;
+  final double translation;
   final bool containWithinParent;
 
   const _SingleChildLayoutDelegate({
     required this.padding,
     required this.fraction,
+    required this.translation,
     required this.containWithinParent,
   });
 
@@ -110,6 +116,7 @@ class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
   bool shouldRelayout(covariant _SingleChildLayoutDelegate oldDelegate) =>
       padding != oldDelegate.padding ||
       fraction != oldDelegate.fraction ||
+      translation != oldDelegate.translation ||
       containWithinParent != oldDelegate.containWithinParent;
 
   @override
@@ -118,17 +125,20 @@ class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
 
   @override
   Offset getPositionForChild(Size size, Size childSize) =>
-      _getOffset(size, childSize, fraction, containWithinParent, padding);
+      _getOffset(size, childSize, fraction, containWithinParent, padding) +
+      Offset(0, childSize.height * translation);
 }
 
 class _ColumnLayoutDelegate extends MultiChildLayoutDelegate {
   final EdgeInsets padding;
   final double fraction;
+  final double translation;
   final List<SelectionOverlayItem> children;
 
   _ColumnLayoutDelegate({
     required this.padding,
     required this.fraction,
+    required this.translation,
     required this.children,
   });
 
@@ -136,23 +146,26 @@ class _ColumnLayoutDelegate extends MultiChildLayoutDelegate {
   bool shouldRelayout(covariant _ColumnLayoutDelegate oldDelegate) =>
       padding != oldDelegate.padding ||
       fraction != oldDelegate.fraction ||
+      translation != oldDelegate.translation ||
       !listEquals(children, oldDelegate.children);
 
   @override
   void performLayout(Size size) {
-    var offsetTop = 0.0;
+    final offsets = <Offset>[];
+    var top = 0.0;
 
     for (var index = 0; index < children.length; index++) {
       final childSize = layoutChild(index, BoxConstraints.loose(size));
       final containWithinParent = children[index].containWithinParent;
-
-      positionChild(
-        index,
+      offsets.add(
         _getOffset(size, childSize, fraction, containWithinParent, padding) +
-            Offset(0, offsetTop),
+            Offset(0, top),
       );
+      top += childSize.height;
+    }
 
-      offsetTop += childSize.height;
+    for (var index = 0; index < offsets.length; index++) {
+      positionChild(index, offsets[index] + Offset(0, top * translation));
     }
   }
 }

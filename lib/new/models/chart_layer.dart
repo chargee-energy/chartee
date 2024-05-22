@@ -48,6 +48,7 @@ class ChartGridLayer extends ChartLayer {
 class ChartSelectionLayer extends ChartLayer {
   final SelectionOverlayBuilder builder;
   final bool sticky;
+  final double translation;
   final List<ChartItem> initialItems;
 
   @override
@@ -56,6 +57,7 @@ class ChartSelectionLayer extends ChartLayer {
   const ChartSelectionLayer({
     required this.builder,
     this.sticky = false,
+    this.translation = 0.0,
     this.initialItems = const [],
   });
 
@@ -64,6 +66,7 @@ class ChartSelectionLayer extends ChartLayer {
         ...super.props,
         builder,
         sticky,
+        translation,
         initialItems,
       ];
 }
