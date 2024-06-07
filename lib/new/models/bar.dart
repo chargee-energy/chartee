@@ -24,5 +24,12 @@ class Bar with EquatableMixin {
   });
 
   @override
-  List<Object?> get props => [fromValue, toValue, color, width, borderRadius];
+  List<Object?> get props => [
+        fromValue,
+        toValue,
+        color,
+        highlightColor,
+        width,
+        borderRadius,
+      ];
 }

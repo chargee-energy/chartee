@@ -15,7 +15,7 @@ class SingleChildSelectionOverlay extends SelectionOverlay {
   const SingleChildSelectionOverlay({required this.child});
 
   @override
-  List<Object?> get props => [child];
+  List<Object?> get props => [...super.props, child];
 }
 
 class ColumnSelectionOverlay extends SelectionOverlay {
@@ -24,5 +24,5 @@ class ColumnSelectionOverlay extends SelectionOverlay {
   const ColumnSelectionOverlay({required this.children});
 
   @override
-  List<Object?> get props => [children];
+  List<Object?> get props => [...super.props, children];
 }

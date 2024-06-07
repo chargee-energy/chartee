@@ -11,5 +11,5 @@ class SelectionOverlayItem with EquatableMixin {
   });
 
   @override
-  List<Object?> get props => [containWithinParent, widget];
+  List<Object?> get props => [widget, containWithinParent];
 }

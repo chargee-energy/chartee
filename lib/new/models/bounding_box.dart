@@ -182,5 +182,5 @@ class BoundingBox with EquatableMixin {
   }
 
   @override
-  List<Object?> get props => [minY, maxY, minX, maxX];
+  List<Object?> get props => [minX, maxX, minY, maxY];
 }

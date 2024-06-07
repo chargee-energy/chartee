@@ -44,5 +44,5 @@ class BarStack extends ChartItem {
   }
 
   @override
-  List<Object?> get props => [width, borderRadius, bars];
+  List<Object?> get props => [...super.props, bars, width, borderRadius];
 }
