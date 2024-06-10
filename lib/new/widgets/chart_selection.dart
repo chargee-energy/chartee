@@ -76,6 +76,7 @@ class _ChartSelectionState extends State<ChartSelection> {
                 fraction: fraction,
                 translation: widget.translation,
                 containWithinParent: child.containWithinParent,
+                fullWidth: child.fullWidth,
               ),
               child: child.widget,
             ),
@@ -106,12 +107,14 @@ class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
   final double fraction;
   final double translation;
   final bool containWithinParent;
+  final bool fullWidth;
 
   const _SingleChildLayoutDelegate({
     required this.padding,
     required this.fraction,
     required this.translation,
     required this.containWithinParent,
+    required this.fullWidth,
   });
 
   @override
@@ -123,11 +126,18 @@ class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
-      BoxConstraints.loose(constraints.smallest);
+      _getConstraints(constraints.smallest, fullWidth);
 
   @override
   Offset getPositionForChild(Size size, Size childSize) =>
-      _getOffset(size, childSize, fraction, containWithinParent, padding) +
+      _getOffset(
+        size,
+        childSize,
+        fraction,
+        containWithinParent,
+        fullWidth,
+        padding,
+      ) +
       Offset(0, childSize.height * translation);
 }
 
@@ -157,10 +167,18 @@ class _ColumnLayoutDelegate extends MultiChildLayoutDelegate {
     var top = 0.0;
 
     for (var index = 0; index < children.length; index++) {
-      final childSize = layoutChild(index, BoxConstraints.loose(size));
+      final fullWidth = children[index].fullWidth;
       final containWithinParent = children[index].containWithinParent;
+      final childSize = layoutChild(index, _getConstraints(size, fullWidth));
       offsets.add(
-        _getOffset(size, childSize, fraction, containWithinParent, padding) +
+        _getOffset(
+              size,
+              childSize,
+              fraction,
+              containWithinParent,
+              fullWidth,
+              padding,
+            ) +
             Offset(0, top),
       );
       top += childSize.height;
@@ -172,13 +190,27 @@ class _ColumnLayoutDelegate extends MultiChildLayoutDelegate {
   }
 }
 
+BoxConstraints _getConstraints(Size size, bool fullWidth) => fullWidth
+    ? BoxConstraints(
+        minWidth: size.width,
+        maxWidth: size.width,
+        minHeight: 0,
+        maxHeight: size.height,
+      )
+    : BoxConstraints.loose(size);
+
 Offset _getOffset(
   Size size,
   Size childSize,
   double fraction,
   bool containWithinParent,
+  bool fullWidth,
   EdgeInsets padding,
 ) {
+  if (fullWidth) {
+    return Offset.zero;
+  }
+
   final width = size.width - padding.horizontal;
   final center = fraction * width;
 
