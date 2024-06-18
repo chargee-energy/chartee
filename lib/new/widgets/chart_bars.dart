@@ -118,8 +118,8 @@ class _BarPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final top = bounds.getFractionY(bar.minValue) * size.height;
-    final bottom = bounds.getFractionY(bar.maxValue) * size.height;
+    final top = (1 - bounds.getFractionY(bar.minValue)) * size.height;
+    final bottom = (1 - bounds.getFractionY(bar.maxValue)) * size.height;
     final width = bar.width ?? size.width;
     final left = (size.width - width) / 2;
 
