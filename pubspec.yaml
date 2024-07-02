@@ -1,7 +1,7 @@
 name: chartee
-description: The chart widget library for the Chargee app
-version: 0.0.1
-homepage: https://bitbucket.org/chargee/chartee
+description: Flutter chart library
+version: 1.0.0
+homepage: https://github.com/chargee-energy/chartee
 
 environment:
   sdk: ">=3.1.0 <4.0.0"
