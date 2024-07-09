@@ -6,3 +6,7 @@
 
 - Updated pubspec.yaml description
 - Added code documentation
+
+## 1.0.2
+
+- Added basic example project
