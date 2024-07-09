@@ -1,3 +1,8 @@
-## 0.0.1
+## 1.0.0
 
-* TODO: Describe initial release.
+- Initial release with support for bar, line and area charts
+
+## 1.0.1
+
+- Updated pubspec.yaml description
+- Added code documentation
