@@ -1,4 +1,4 @@
-name: Publish to pub.dev
+name: Publish to Pub.dev
 
 on:
   push:
@@ -6,9 +6,15 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+*"
 
 jobs:
-  publish:
-    permissions:
-      id-token: write # Required for authentication using OIDC
-    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
-    # with:
-    #   working-directory: path/to/package/within/repository
+  publishing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@main # required!
+
+      - name: ">> Dart package <<"
+        uses: k-paxian/dart-package-publisher@v1.6
+        with:
+          credentialJson: ${{ secrets.CREDENTIAL_JSON }}
+          skipTests: true
+          flutter: true

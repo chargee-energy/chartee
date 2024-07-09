@@ -10,3 +10,7 @@
 ## 1.0.2
 
 - Added basic example project
+
+## 1.0.3
+
+- Updated Github action
