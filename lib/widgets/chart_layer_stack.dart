@@ -36,7 +36,6 @@ class ChartLayerStack extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        ...labels,
         ...layers.map(
           (layer) => switch (layer) {
             ChartGridLayer(
@@ -119,6 +118,7 @@ class ChartLayerStack extends StatelessWidget {
               builder(context, bounds, padding),
           },
         ),
+        ...labels,
       ],
     );
   }

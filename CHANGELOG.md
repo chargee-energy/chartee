@@ -18,3 +18,7 @@
 ## 1.0.4
 
 - Added a layer type to support custom widgets in a chart
+
+## 1.0.5
+
+- Draw labels over other chart layers
