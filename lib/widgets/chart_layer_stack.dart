@@ -115,6 +115,8 @@ class ChartLayerStack extends StatelessWidget {
                   point: point,
                 ),
               ),
+            ChartCustomLayer(:final builder) =>
+              builder(context, bounds, padding),
           },
         ),
       ],

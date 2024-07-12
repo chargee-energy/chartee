@@ -14,3 +14,7 @@
 ## 1.0.3
 
 - Updated Github action
+
+## 1.0.4
+
+- Added a layer type to support custom widgets in a chart

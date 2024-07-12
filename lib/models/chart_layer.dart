@@ -9,6 +9,7 @@ import 'cursor_builder.dart';
 import 'point.dart';
 import 'grid_line.dart';
 import 'selection_overlay_builder.dart';
+import 'widget_builder.dart';
 
 /// Represents a layer in a chart.
 ///
@@ -215,4 +216,27 @@ class ChartCursorLayer extends ChartLayer {
 
   @override
   List<Object?> get props => [...super.props, builder, point];
+}
+
+/// Represents a layer in a chart that displays a custom widget.
+///
+/// This class extends [ChartLayer] and provides properties for the widget builder.
+class ChartCustomLayer extends ChartLayer {
+  /// The builder for the custom widget.
+  final WidgetBuilder builder;
+
+  @override
+  final BoundingBox bounds;
+
+  /// Creates a new instance of ChartCustomLayer with the specified widget builder and bounds.
+  ///
+  /// The [builder] parameter is required and represents the builder for the widget.
+  /// The [bounds] parameter is optional and defines the bounds of this layer.
+  const ChartCustomLayer({
+    required this.builder,
+    this.bounds = const BoundingBox.flexible(),
+  });
+
+  @override
+  List<Object?> get props => [...super.props, builder];
 }
