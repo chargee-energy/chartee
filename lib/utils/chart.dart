@@ -99,6 +99,7 @@ class RoundedYIntervals implements IntervalsProvider {
     final max = bounds.maxY;
 
     if (min == null || max == null) {
+      _ticks.addAll([0, 1]);
       return;
     }
 

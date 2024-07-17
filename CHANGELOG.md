@@ -22,3 +22,7 @@
 ## 1.0.5
 
 - Draw labels over other chart layers
+
+## 1.0.6
+
+- Added default value to `RoundedYIntervals` when bounds are flexible
