@@ -60,7 +60,7 @@ class OutlineYIntervals implements IntervalsProvider {
     final max = bounds.maxY;
 
     if (min == null || max == null) {
-      return [];
+      return [0, 1];
     }
 
     if (min < 0 && max > 0) {
@@ -109,8 +109,8 @@ class RoundedYIntervals implements IntervalsProvider {
         return;
       }
 
-      final offset = min.abs() * 0.1;
-      _ticks.addAll([min, min + offset]);
+      final offset = min.abs() * 0.05;
+      _ticks.addAll([min - offset, min + offset]);
       return;
     }
 

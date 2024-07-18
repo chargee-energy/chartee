@@ -26,3 +26,7 @@
 ## 1.0.6
 
 - Added default value to `RoundedYIntervals` when bounds are flexible
+
+## 1.0.7
+
+- Changed rounding in `RoundedYIntervals` when bounds min and max are the same
