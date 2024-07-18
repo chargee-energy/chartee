@@ -110,7 +110,7 @@ class RoundedYIntervals implements IntervalsProvider {
       }
 
       final offset = min.abs() * 0.05;
-      _ticks.addAll([min - offset, min + offset]);
+      _ticks.addAll([min - offset, min, min + offset]);
       return;
     }
 
