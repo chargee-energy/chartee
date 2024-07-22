@@ -1,6 +1,6 @@
 name: chartee
 description: Chartee is a versatile library supporting line, bar, and area charts for Flutter applications. Easily visualize data with customizable styles.
-version: 1.0.8
+version: 1.0.9
 homepage: https://github.com/chargee-energy/chartee
 
 environment:

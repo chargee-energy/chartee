@@ -61,24 +61,28 @@ class Chart extends StatelessWidget {
     );
 
     final topLabelValues = _getLabelValues(
+      context,
       topLabels,
       xIntervals.intervals,
       intervalsAdjustedBounds.getFractionX,
     );
 
     final bottomLabelValues = _getLabelValues(
+      context,
       bottomLabels,
       xIntervals.intervals,
       intervalsAdjustedBounds.getFractionX,
     );
 
     final leftLabelValues = _getLabelValues(
+      context,
       leftLabels,
       yIntervals.intervals,
       intervalsAdjustedBounds.getFractionY,
     );
 
     final rightLabelValues = _getLabelValues(
+      context,
       rightLabels,
       yIntervals.intervals,
       intervalsAdjustedBounds.getFractionY,
@@ -165,6 +169,7 @@ class Chart extends StatelessWidget {
   }
 
   List<({double fraction, TextPainter painter})>? _getLabelValues(
+    BuildContext context,
     Labels? labels,
     List<double> intervals,
     double Function(double) getFraction,
@@ -184,6 +189,7 @@ class Chart extends StatelessWidget {
                     text: TextSpan(text: text, style: labels.style),
                     textAlign: labels.textAlign,
                     textDirection: TextDirection.ltr,
+                    textScaler: MediaQuery.textScalerOf(context),
                   )..layout();
 
                   return (

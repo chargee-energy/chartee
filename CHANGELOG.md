@@ -1,3 +1,7 @@
+## 1.0.9
+
+- Make font size of labels adjustable through OS accessibility settings
+
 ## 1.0.8
 
 - Include the actual value also in `RoundedYIntervals` when bounds min and max are the same
