@@ -19,6 +19,9 @@ sealed class ChartLayer with EquatableMixin {
   /// Returns the bounding box of the chart layer.
   BoundingBox get bounds;
 
+  /// Whether the layer should remain static in a scrollable chart
+  bool get isStatic;
+
   /// Creates a new instance of ChartLayer.
   const ChartLayer();
 
@@ -38,6 +41,10 @@ class ChartGridLayer extends ChartLayer {
 
   @override
   BoundingBox get bounds => const BoundingBox.flexible();
+
+  @override
+  // TODO: Only true for horizontal grids
+  bool get isStatic => true;
 
   /// Creates a new instance of ChartGridLayer with both horizontal and vertical line builders.
   ///
@@ -82,6 +89,9 @@ class ChartSelectionLayer extends ChartLayer {
   @override
   BoundingBox get bounds => const BoundingBox.flexible();
 
+  @override
+  bool get isStatic => false;
+
   /// Creates a new instance of ChartSelectionLayer.
   ///
   /// The [builder] is required, while [sticky], [translation], and [initialItems] have default values.
@@ -113,6 +123,9 @@ sealed class ChartItemLayer<Item extends ChartItem> extends ChartLayer {
 
   @override
   BoundingBox get bounds => BoundingBox.merge(items.map((item) => item.bounds));
+
+  @override
+  bool get isStatic => false;
 
   /// Creates a new instance of ChartItemLayer with the provided list of items.
   const ChartItemLayer({required this.items});
@@ -208,6 +221,9 @@ class ChartCursorLayer extends ChartLayer {
   @override
   BoundingBox get bounds => const BoundingBox.flexible();
 
+  @override
+  bool get isStatic => false;
+
   /// Creates a new instance of ChartCursorLayer with the specified cursor builder and position.
   ///
   /// The [builder] parameter is required and represents the builder for the cursor.
@@ -228,6 +244,9 @@ class ChartCustomLayer extends ChartLayer {
   @override
   final BoundingBox bounds;
 
+  @override
+  final bool isStatic;
+
   /// Creates a new instance of ChartCustomLayer with the specified widget builder and bounds.
   ///
   /// The [builder] parameter is required and represents the builder for the widget.
@@ -235,6 +254,7 @@ class ChartCustomLayer extends ChartLayer {
   const ChartCustomLayer({
     required this.builder,
     this.bounds = const BoundingBox.flexible(),
+    this.isStatic = false,
   });
 
   @override

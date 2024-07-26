@@ -1,9 +1,9 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
+import '../utils/items.dart';
 
 class ChartGestureHandler extends StatefulWidget {
   final EdgeInsets padding;
@@ -29,7 +29,7 @@ class ChartGestureHandler extends StatefulWidget {
 class _ChartGestureHandlerState extends State<ChartGestureHandler> {
   List<ChartItem> _selectedItems = [];
 
-  List<ChartItem> _findItemsForOffset(Offset localPosition) {
+  List<ChartItem> _findNearestItems(Offset localPosition) {
     if (widget.items.isEmpty) {
       return [];
     }
@@ -37,21 +37,8 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
     final renderBox = context.findRenderObject() as RenderBox;
     final width = renderBox.size.width - widget.padding.horizontal;
     final x = localPosition.dx - widget.padding.left;
-    final fractionX = x / width;
 
-    final distances = widget.items
-        .map(
-          (item) => (
-            item: item,
-            distance: (fractionX - widget.bounds.getFractionX(item.x)).abs(),
-          ),
-        )
-        .sorted((a, b) => ((a.distance - b.distance) * 100).toInt());
-
-    return distances
-        .map((distance) => distance.item)
-        .where((item) => item.x == distances.first.item.x)
-        .toList();
+    return nearestItemsForOffset(widget.bounds, widget.items, x, width);
   }
 
   void _setSelectedItems(List<ChartItem> items) {
@@ -77,12 +64,12 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTapDown: (details) {
-        final items = _findItemsForOffset(details.localPosition);
+        final items = _findNearestItems(details.localPosition);
         _setSelectedItems(items);
       },
       onTapUp: (_) => _resetSelectedItems(),
       onHorizontalDragUpdate: (details) {
-        final items = _findItemsForOffset(details.localPosition);
+        final items = _findNearestItems(details.localPosition);
         _setSelectedItems(items);
       },
       onHorizontalDragEnd: (_) => _resetSelectedItems(),
