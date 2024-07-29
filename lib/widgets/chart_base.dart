@@ -118,7 +118,7 @@ class ChartBase extends StatelessWidget {
 
     return builder(
       context,
-      bounds,
+      intervalsAdjustedBounds,
       items,
       contentPadding,
       xIntervals,
