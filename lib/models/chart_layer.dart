@@ -103,8 +103,8 @@ class ChartSelectionLayer extends ChartLayer {
   /// The translation value for the selection.
   final double translation;
 
-  /// The initial items selected in the chart.
-  final List<ChartItem> initialItems;
+  /// The initial x selected in the chart.
+  final double? initialSelectedX;
 
   @override
   BoundingBox get bounds => const BoundingBox.flexible();
@@ -114,12 +114,12 @@ class ChartSelectionLayer extends ChartLayer {
 
   /// Creates a new instance of ChartSelectionLayer.
   ///
-  /// The [builder] is required, while [sticky], [translation], and [initialItems] have default values.
+  /// The [builder] is required, while [sticky], [translation], and [initialSelectedX] have default values.
   const ChartSelectionLayer({
     required this.builder,
     this.sticky = false,
     this.translation = 0.0,
-    this.initialItems = const [],
+    this.initialSelectedX,
   });
 
   @override
@@ -128,7 +128,7 @@ class ChartSelectionLayer extends ChartLayer {
         builder,
         sticky,
         translation,
-        initialItems,
+        initialSelectedX,
       ];
 }
 

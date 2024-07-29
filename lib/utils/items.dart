@@ -3,14 +3,14 @@ import 'package:collection/collection.dart';
 import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
 
-List<ChartItem> nearestItemsForOffset(
+double? nearestXForOffset(
   BoundingBox bounds,
   List<ChartItem> items,
   double offset,
   double width,
 ) {
   if (items.isEmpty) {
-    return [];
+    return null;
   }
 
   final fraction = offset / width;
@@ -23,8 +23,5 @@ List<ChartItem> nearestItemsForOffset(
       )
       .sorted((a, b) => ((a.distance - b.distance) * 100).toInt());
 
-  return distances
-      .map((distance) => distance.item)
-      .where((item) => item.x == distances.first.item.x)
-      .toList();
+  return distances.first.item.x;
 }

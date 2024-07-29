@@ -1,8 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../models/bar_stack.dart';
 import '../models/bounding_box.dart';
-import '../models/chart_item.dart';
 import '../models/chart_layer.dart';
 import '../widgets/chart_area.dart';
 import '../widgets/chart_bars.dart';
@@ -17,7 +15,7 @@ Widget getLayerWidget(
   BoundingBox bounds,
   List<double> xIntervals,
   List<double> yIntervals,
-  List<ChartItem> selectedItems,
+  double? selectedX,
   EdgeInsets padding,
 ) =>
     switch (layer) {
@@ -38,13 +36,13 @@ Widget getLayerWidget(
         :final builder,
         :final sticky,
         :final translation,
-        :final initialItems,
+        :final initialSelectedX
       ) =>
         ChartSelection(
           padding: padding,
           bounds: bounds,
-          items: selectedItems,
-          initialItems: initialItems,
+          selectedX: selectedX,
+          initialSelectedX: initialSelectedX,
           builder: builder,
           sticky: sticky,
           translation: translation,
@@ -86,7 +84,8 @@ Widget getLayerWidget(
           child: ChartBars(
             bounds: bounds,
             barStacks: items,
-            selectedBarStacks: selectedItems.whereType<BarStack>().toList(),
+            selectedBarStacks:
+                items.where((item) => item.x == selectedX).toList(),
           ),
         ),
       ChartCursorLayer(:final builder, :final point) => Padding(

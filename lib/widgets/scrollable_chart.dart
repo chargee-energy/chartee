@@ -16,6 +16,7 @@ class ScrollableChart extends StatelessWidget {
   final List<ChartLayer> layers;
   final double contentWidth;
   final double contentInset;
+  final ScrollableChartController? controller;
   final EdgeInsets padding;
   final Labels? leftLabels;
   final Labels? rightLabels;
@@ -33,6 +34,7 @@ class ScrollableChart extends StatelessWidget {
     required this.layers,
     required this.contentWidth,
     this.contentInset = 0,
+    this.controller,
     this.padding = EdgeInsets.zero,
     this.leftLabels,
     this.rightLabels,
@@ -73,6 +75,7 @@ class ScrollableChart extends StatelessWidget {
         layers: layers,
         contentWidth: contentWidth,
         contentInset: contentInset,
+        controller: controller,
         padding: contentPadding,
         items: items,
         xIntervals: xIntervals.intervals,
@@ -91,6 +94,7 @@ class ChartScrollView extends StatefulWidget {
   final List<ChartLayer> layers;
   final double contentWidth;
   final double contentInset;
+  final ScrollableChartController? controller;
   final EdgeInsets padding;
   final List<ChartItem> items;
   final List<double> xIntervals;
@@ -106,6 +110,7 @@ class ChartScrollView extends StatefulWidget {
     required this.layers,
     required this.contentWidth,
     required this.contentInset,
+    required this.controller,
     required this.padding,
     required this.items,
     required this.xIntervals,
@@ -121,47 +126,61 @@ class ChartScrollView extends StatefulWidget {
 }
 
 class _ChartScrollViewState extends State<ChartScrollView> {
-  late ScrollController _controller;
-  List<ChartItem> _selectedItems = [];
+  late ScrollableChartController _controller;
+  double? _selectedX;
 
   @override
   void initState() {
     super.initState();
     _initController();
+    _selectedX = _controller.initialX;
   }
 
   @override
   void didUpdateWidget(covariant ChartScrollView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.contentWidth != widget.contentWidth) {
-      _controller.dispose();
+    if (oldWidget.controller != widget.controller ||
+        oldWidget.contentWidth != widget.contentWidth) {
+      _unlinkController(oldWidget.controller == null);
       _initController();
     }
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_updateSelectedItems);
-    _controller.dispose();
+    _unlinkController(widget.controller == null);
     super.dispose();
   }
 
   void _initController() {
-    _controller = ScrollableChartController(contentWidth: widget.contentWidth);
+    _controller = widget.controller ?? ScrollableChartController();
+    _controller.init(
+      bounds: widget.bounds,
+      items: widget.items,
+      contentWidth: widget.contentWidth,
+    );
     _controller.addListener(_updateSelectedItems);
   }
 
+  void _unlinkController(bool dispose) {
+    _controller.removeListener(_updateSelectedItems);
+    _controller.reset();
+    if (dispose) {
+      _controller.dispose();
+    }
+  }
+
   void _updateSelectedItems() {
-    final nearestItems = nearestItemsForOffset(
+    final nearestX = nearestXForOffset(
       widget.bounds,
       widget.items,
       _controller.offset,
       widget.contentWidth,
     );
 
-    if (!listEquals(nearestItems, _selectedItems)) {
+    if (nearestX != _selectedX) {
       setState(() {
-        _selectedItems = nearestItems;
+        _selectedX = nearestX;
       });
     }
   }
@@ -189,7 +208,7 @@ class _ChartScrollViewState extends State<ChartScrollView> {
                   widget.bounds,
                   widget.xIntervals,
                   widget.yIntervals,
-                  _selectedItems,
+                  _selectedX,
                   widget.padding,
                 );
 
@@ -298,18 +317,15 @@ class ScrollableChartPhysics extends ScrollPhysics {
   }
 
   double _getTargetPixels(ScrollMetrics position) {
-    final nearestItems = nearestItemsForOffset(
-      bounds,
-      items,
-      position.pixels,
-      contentWidth,
-    );
+    final nearestX = position is ScrollableChartPosition
+        ? position.nearestX
+        : nearestXForOffset(bounds, items, position.pixels, contentWidth);
 
-    if (nearestItems.isEmpty) {
+    if (nearestX == null) {
       return position.pixels;
     }
 
-    return bounds.getFractionX(nearestItems.first.x) * contentWidth;
+    return bounds.getFractionX(nearestX) * contentWidth;
   }
 
   @override
@@ -345,13 +361,33 @@ class ScrollableChartPhysics extends ScrollPhysics {
 }
 
 class ScrollableChartPosition extends ScrollPositionWithSingleContext {
+  final BoundingBox bounds;
+  final List<ChartItem> items;
   final double contentWidth;
+  final double? initialX;
+
+  @override
+  double get minScrollExtent => 0;
 
   @override
   double get maxScrollExtent => contentWidth;
 
+  double? get nearestX {
+    assert(
+      !hasPixels || hasContentDimensions,
+      'Nearest items are only available after content dimensions are established.',
+    );
+    return !hasPixels || !hasContentDimensions
+        ? null
+        : getNearestXFromPixels(
+            clampDouble(pixels, minScrollExtent, maxScrollExtent));
+  }
+
   ScrollableChartPosition({
+    required this.bounds,
+    required this.items,
     required this.contentWidth,
+    required this.initialX,
     required super.physics,
     required super.context,
     super.initialPixels,
@@ -359,33 +395,132 @@ class ScrollableChartPosition extends ScrollPositionWithSingleContext {
     super.oldPosition,
     super.debugLabel,
   });
+
+  double getPixelsFromX(double x) => bounds.getFractionX(x) * contentWidth;
+
+  double? getNearestXFromPixels(double pixels) =>
+      nearestXForOffset(bounds, items, pixels, contentWidth);
+
+  @override
+  bool applyViewportDimension(double viewportDimension) {
+    final oldViewportDimensions =
+        hasViewportDimension ? this.viewportDimension : null;
+
+    if (viewportDimension == oldViewportDimensions) {
+      return true;
+    }
+
+    final result = super.applyViewportDimension(viewportDimension);
+    final oldPixels = hasPixels ? pixels : null;
+
+    // TODO: Cache x when viewport resizes to zero? (See PageView)
+    final x = initialX;
+    final newPixels = x != null ? getPixelsFromX(x) : null;
+
+    if (newPixels != null && newPixels != oldPixels) {
+      correctPixels(newPixels);
+      return false;
+    }
+
+    return result;
+  }
 }
 
 class ScrollableChartController extends ScrollController {
-  final double contentWidth;
+  final double? initialX;
+
+  BoundingBox? _bounds;
+  List<ChartItem>? _items;
+  double? _contentWidth;
+
+  double? get nearestX {
+    assert(
+      positions.isNotEmpty,
+      'ScrollableChartController.nearestX cannot be accessed before a ScrollableChart is built with it.',
+    );
+    assert(
+      positions.length == 1,
+      'The page nearestX cannot be read when multiple ScrollableChart are attached to '
+      'the same ScrollableChartController.',
+    );
+    final ScrollableChartPosition position =
+        this.position as ScrollableChartPosition;
+    return position.nearestX;
+  }
 
   ScrollableChartController({
-    required this.contentWidth,
-    super.initialScrollOffset,
-    super.keepScrollOffset,
-    super.debugLabel,
+    this.initialX,
     super.onAttach,
     super.onDetach,
   });
+
+  void init({
+    required BoundingBox bounds,
+    required List<ChartItem> items,
+    required double contentWidth,
+  }) {
+    assert(
+      _bounds == null && _items == null && _contentWidth == null,
+      'ScrollableChartController can only be initialized once',
+    );
+
+    _bounds = bounds;
+    _items = items;
+    _contentWidth = contentWidth;
+  }
+
+  void reset() {
+    _ensureInitialized();
+    _bounds = null;
+    _items = null;
+    _contentWidth = null;
+  }
+
+  Future<void> animateToX(
+    double x, {
+    required Duration duration,
+    required Curve curve,
+  }) {
+    final ScrollableChartPosition position =
+        this.position as ScrollableChartPosition;
+    return position.animateTo(
+      position.getPixelsFromX(x),
+      duration: duration,
+      curve: curve,
+    );
+  }
+
+  void jumpToX(double x) {
+    final ScrollableChartPosition position =
+        this.position as ScrollableChartPosition;
+    position.jumpTo(position.getPixelsFromX(x));
+  }
 
   @override
   ScrollPosition createScrollPosition(
     ScrollPhysics physics,
     ScrollContext context,
     ScrollPosition? oldPosition,
-  ) =>
-      ScrollableChartPosition(
-        contentWidth: contentWidth,
-        physics: physics,
-        context: context,
-        initialPixels: initialScrollOffset,
-        keepScrollOffset: keepScrollOffset,
-        oldPosition: oldPosition,
-        debugLabel: debugLabel,
-      );
+  ) {
+    _ensureInitialized();
+    return ScrollableChartPosition(
+      bounds: _bounds!,
+      items: _items!,
+      contentWidth: _contentWidth!,
+      initialX: initialX,
+      physics: physics,
+      context: context,
+      initialPixels: initialScrollOffset,
+      keepScrollOffset: keepScrollOffset,
+      oldPosition: oldPosition,
+      debugLabel: debugLabel,
+    );
+  }
+
+  void _ensureInitialized() {
+    assert(
+      _bounds != null && _items != null && _contentWidth != null,
+      'This ScrollableChartController has not been initialized yet.',
+    );
+  }
 }

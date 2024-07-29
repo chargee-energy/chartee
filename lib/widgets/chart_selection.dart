@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/bounding_box.dart';
-import '../models/chart_item.dart';
 import '../models/selection_overlay.dart';
 import '../models/selection_overlay_builder.dart';
 import '../models/selection_overlay_item.dart';
@@ -11,8 +10,8 @@ import '../models/selection_overlay_item.dart';
 class ChartSelection extends StatefulWidget {
   final EdgeInsets padding;
   final BoundingBox bounds;
-  final List<ChartItem> items;
-  final List<ChartItem> initialItems;
+  final double? selectedX;
+  final double? initialSelectedX;
   final SelectionOverlayBuilder builder;
   final bool sticky;
   final double translation;
@@ -21,8 +20,8 @@ class ChartSelection extends StatefulWidget {
     super.key,
     required this.padding,
     required this.bounds,
-    required this.items,
-    required this.initialItems,
+    required this.selectedX,
+    required this.initialSelectedX,
     required this.builder,
     required this.sticky,
     required this.translation,
@@ -33,72 +32,74 @@ class ChartSelection extends StatefulWidget {
 }
 
 class _ChartSelectionState extends State<ChartSelection> {
-  List<ChartItem> _items = [];
+  double? _selectedX;
 
   @override
   void initState() {
     super.initState();
     if (widget.sticky) {
-      _items = widget.initialItems;
+      _selectedX = widget.initialSelectedX;
+    } else {
+      _selectedX = widget.selectedX;
     }
   }
 
   @override
   void didUpdateWidget(covariant ChartSelection oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    if (widget.items.isNotEmpty) {
-      _items = widget.items;
+    if (widget.selectedX != null) {
+      _selectedX = widget.selectedX;
     } else if (!widget.sticky) {
-      _items = [];
+      _selectedX = null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_items.isEmpty) {
-      return const SizedBox.shrink();
+    if (_selectedX case final x?) {
+      final overlay = widget.builder(x);
+      final fraction = widget.bounds.getFractionX(x);
+
+      return RepaintBoundary(
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: widget.padding.top,
+            bottom: widget.padding.bottom,
+          ),
+          child: switch (overlay) {
+            SingleChildSelectionOverlay(:final child) =>
+              CustomSingleChildLayout(
+                delegate: _SingleChildLayoutDelegate(
+                  padding: widget.padding,
+                  fraction: fraction,
+                  translation: widget.translation,
+                  containWithinParent: child.containWithinParent,
+                  fullWidth: child.fullWidth,
+                ),
+                child: child.widget,
+              ),
+            ColumnSelectionOverlay(:final children) => CustomMultiChildLayout(
+                delegate: _ColumnLayoutDelegate(
+                  padding: widget.padding,
+                  fraction: fraction,
+                  translation: widget.translation,
+                  children: children,
+                ),
+                children: children
+                    .mapIndexed(
+                      (index, child) => LayoutId(
+                        id: index,
+                        child: child.widget,
+                      ),
+                    )
+                    .toList(),
+              ),
+          },
+        ),
+      );
     }
 
-    final overlay = widget.builder(_items);
-    final fraction = widget.bounds.getFractionX(_items.first.x);
-
-    return RepaintBoundary(
-      child: Padding(
-        padding: EdgeInsets.only(
-          top: widget.padding.top,
-          bottom: widget.padding.bottom,
-        ),
-        child: switch (overlay) {
-          SingleChildSelectionOverlay(:final child) => CustomSingleChildLayout(
-              delegate: _SingleChildLayoutDelegate(
-                padding: widget.padding,
-                fraction: fraction,
-                translation: widget.translation,
-                containWithinParent: child.containWithinParent,
-                fullWidth: child.fullWidth,
-              ),
-              child: child.widget,
-            ),
-          ColumnSelectionOverlay(:final children) => CustomMultiChildLayout(
-              delegate: _ColumnLayoutDelegate(
-                padding: widget.padding,
-                fraction: fraction,
-                translation: widget.translation,
-                children: children,
-              ),
-              children: children
-                  .mapIndexed(
-                    (index, child) => LayoutId(
-                      id: index,
-                      child: child.widget,
-                    ),
-                  )
-                  .toList(),
-            ),
-        },
-      ),
-    );
+    return const SizedBox.shrink();
   }
 }
 
