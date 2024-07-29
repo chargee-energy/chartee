@@ -121,28 +121,41 @@ class ChartScrollView extends StatefulWidget {
 }
 
 class _ChartScrollViewState extends State<ChartScrollView> {
-  late ScrollController _scrollController;
+  late ScrollController _controller;
   List<ChartItem> _selectedItems = [];
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_updateSelectedItems);
+    _initController();
+  }
+
+  @override
+  void didUpdateWidget(covariant ChartScrollView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.contentWidth != widget.contentWidth) {
+      _controller.dispose();
+      _initController();
+    }
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_updateSelectedItems);
-    _scrollController.dispose();
+    _controller.removeListener(_updateSelectedItems);
+    _controller.dispose();
     super.dispose();
+  }
+
+  void _initController() {
+    _controller = ScrollableChartController(contentWidth: widget.contentWidth);
+    _controller.addListener(_updateSelectedItems);
   }
 
   void _updateSelectedItems() {
     final nearestItems = nearestItemsForOffset(
       widget.bounds,
       widget.items,
-      _scrollController.offset,
+      _controller.offset,
       widget.contentWidth,
     );
 
@@ -156,7 +169,7 @@ class _ChartScrollViewState extends State<ChartScrollView> {
   @override
   Widget build(BuildContext context) {
     return Scrollable(
-      controller: _scrollController,
+      controller: _controller,
       axisDirection: AxisDirection.right,
       clipBehavior: Clip.none,
       physics: ScrollableChartPhysics(
@@ -164,6 +177,8 @@ class _ChartScrollViewState extends State<ChartScrollView> {
         items: widget.items,
         contentWidth: widget.contentWidth,
       ),
+      scrollBehavior:
+          ScrollConfiguration.of(context).copyWith(scrollbars: false),
       viewportBuilder: (context, position) => Stack(
         fit: StackFit.expand,
         children: widget.layers.map(
@@ -327,4 +342,50 @@ class ScrollableChartPhysics extends ScrollPhysics {
 
   @override
   bool get allowImplicitScrolling => false;
+}
+
+class ScrollableChartPosition extends ScrollPositionWithSingleContext {
+  final double contentWidth;
+
+  @override
+  double get maxScrollExtent => contentWidth;
+
+  ScrollableChartPosition({
+    required this.contentWidth,
+    required super.physics,
+    required super.context,
+    super.initialPixels,
+    super.keepScrollOffset,
+    super.oldPosition,
+    super.debugLabel,
+  });
+}
+
+class ScrollableChartController extends ScrollController {
+  final double contentWidth;
+
+  ScrollableChartController({
+    required this.contentWidth,
+    super.initialScrollOffset,
+    super.keepScrollOffset,
+    super.debugLabel,
+    super.onAttach,
+    super.onDetach,
+  });
+
+  @override
+  ScrollPosition createScrollPosition(
+    ScrollPhysics physics,
+    ScrollContext context,
+    ScrollPosition? oldPosition,
+  ) =>
+      ScrollableChartPosition(
+        contentWidth: contentWidth,
+        physics: physics,
+        context: context,
+        initialPixels: initialScrollOffset,
+        keepScrollOffset: keepScrollOffset,
+        oldPosition: oldPosition,
+        debugLabel: debugLabel,
+      );
 }
