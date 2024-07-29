@@ -29,45 +29,65 @@ sealed class ChartLayer with EquatableMixin {
   List<Object?> get props => [];
 }
 
-/// Represents a layer in a chart that displays grid lines.
-///
-/// This class extends [ChartLayer] and provides properties for horizontal and vertical grid line builders.
-class ChartGridLayer extends ChartLayer {
-  /// The builder for horizontal grid lines.
-  final GridLineBuilder? horizontalLineBuilder;
+/// Helper class to create grid layers
+abstract final class ChartGridLayer {
+  /// Creates a list with new instances of ChartHorizontalGridLineLayer and ChartVerticalGridLineLayer.
+  static List<ChartLayer> all({
+    required GridLineBuilder horizontalLineBuilder,
+    required GridLineBuilder verticalLineBuilder,
+  }) =>
+      [
+        ChartHorizontalGridLineLayer(horizontalLineBuilder),
+        ChartVerticalGridLineLayer(verticalLineBuilder),
+      ];
 
-  /// The builder for vertical grid lines.
-  final GridLineBuilder? verticalLineBuilder;
+  /// Creates a new instance of ChartHorizontalGridLineLayer.
+  static ChartLayer horizontal(GridLineBuilder lineBuilder) =>
+      ChartHorizontalGridLineLayer(lineBuilder);
+
+  /// Creates a new instance of ChartVerticalGridLineLayer.
+  static ChartLayer vertical(GridLineBuilder lineBuilder) =>
+      ChartVerticalGridLineLayer(lineBuilder);
+}
+
+/// Represents a layer in a chart that displays horizontal grid lines.
+///
+/// This class extends [ChartLayer] and provides a property for horizontal grid line builder.
+class ChartHorizontalGridLineLayer extends ChartLayer {
+  /// The builder for grid lines.
+  final GridLineBuilder lineBuilder;
 
   @override
   BoundingBox get bounds => const BoundingBox.flexible();
 
   @override
-  // TODO: Only true for horizontal grids
   bool get isStatic => true;
 
-  /// Creates a new instance of ChartGridLayer with both horizontal and vertical line builders.
-  ///
-  /// Either [horizontalLineBuilder] or [verticalLineBuilder] can be null based on the type of grid layer.
-  const ChartGridLayer.all({
-    required this.horizontalLineBuilder,
-    required this.verticalLineBuilder,
-  });
-
-  /// Creates a new instance of ChartGridLayer with only horizontal grid lines.
-  const ChartGridLayer.horizontal(this.horizontalLineBuilder)
-      : verticalLineBuilder = null;
-
-  /// Creates a new instance of ChartGridLayer with only vertical grid lines.
-  const ChartGridLayer.vertical(this.verticalLineBuilder)
-      : horizontalLineBuilder = null;
+  /// Creates a new instance of ChartHorizontalGridLineLayer with the provided line builder
+  const ChartHorizontalGridLineLayer(this.lineBuilder);
 
   @override
-  List<Object?> get props => [
-        ...super.props,
-        horizontalLineBuilder,
-        verticalLineBuilder,
-      ];
+  List<Object?> get props => [...super.props, lineBuilder];
+}
+
+/// Represents a layer in a chart that displays vertical grid lines.
+///
+/// This class extends [ChartLayer] and provides a property for vertical grid line builder.
+class ChartVerticalGridLineLayer extends ChartLayer {
+  /// The builder for grid lines.
+  final GridLineBuilder lineBuilder;
+
+  @override
+  BoundingBox get bounds => const BoundingBox.flexible();
+
+  @override
+  bool get isStatic => false;
+
+  /// Creates a new instance of ChartVerticalGridLineLayer with the provided line builder
+  const ChartVerticalGridLineLayer(this.lineBuilder);
+
+  @override
+  List<Object?> get props => [...super.props, lineBuilder];
 }
 
 /// Represents a layer in a chart that handles selection overlay.

@@ -21,17 +21,18 @@ Widget getLayerWidget(
   EdgeInsets padding,
 ) =>
     switch (layer) {
-      ChartGridLayer(
-        :final horizontalLineBuilder,
-        :final verticalLineBuilder,
-      ) =>
-        ChartGrid(
+      ChartHorizontalGridLineLayer(:final lineBuilder) =>
+        HorizontalChartGridLines(
           padding: padding,
           bounds: bounds,
-          xIntervals: xIntervals,
-          yIntervals: yIntervals,
-          horizontalLineBuilder: horizontalLineBuilder,
-          verticalLineBuilder: verticalLineBuilder,
+          intervals: yIntervals,
+          lineBuilder: lineBuilder,
+        ),
+      ChartVerticalGridLineLayer(:final lineBuilder) => VerticalChartGridLines(
+          padding: padding,
+          bounds: bounds,
+          intervals: xIntervals,
+          lineBuilder: lineBuilder,
         ),
       ChartSelectionLayer(
         :final builder,

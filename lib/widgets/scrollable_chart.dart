@@ -13,8 +13,9 @@ import '../utils/layers.dart';
 import 'chart_base.dart';
 
 class ScrollableChart extends StatelessWidget {
-  final double contentWidth;
   final List<ChartLayer> layers;
+  final double contentWidth;
+  final double contentInset;
   final EdgeInsets padding;
   final Labels? leftLabels;
   final Labels? rightLabels;
@@ -29,8 +30,9 @@ class ScrollableChart extends StatelessWidget {
 
   const ScrollableChart({
     super.key,
-    required this.contentWidth,
     required this.layers,
+    required this.contentWidth,
+    this.contentInset = 0,
     this.padding = EdgeInsets.zero,
     this.leftLabels,
     this.rightLabels,
@@ -67,9 +69,10 @@ class ScrollableChart extends StatelessWidget {
         bottomLabels,
       ) =>
           ChartScrollView(
-        contentWidth: contentWidth,
         bounds: bounds,
         layers: layers,
+        contentWidth: contentWidth,
+        contentInset: contentInset,
         padding: contentPadding,
         items: items,
         xIntervals: xIntervals.intervals,
@@ -84,9 +87,10 @@ class ScrollableChart extends StatelessWidget {
 }
 
 class ChartScrollView extends StatefulWidget {
-  final double contentWidth;
   final BoundingBox bounds;
   final List<ChartLayer> layers;
+  final double contentWidth;
+  final double contentInset;
   final EdgeInsets padding;
   final List<ChartItem> items;
   final List<double> xIntervals;
@@ -100,9 +104,10 @@ class ChartScrollView extends StatefulWidget {
     super.key,
     required this.bounds,
     required this.layers,
+    required this.contentWidth,
+    required this.contentInset,
     required this.padding,
     required this.items,
-    required this.contentWidth,
     required this.xIntervals,
     required this.yIntervals,
     required this.leftLabels,
@@ -180,6 +185,7 @@ class _ChartScrollViewState extends State<ChartScrollView> {
                 return ChartScrollSection(
                   position: position,
                   contentWidth: widget.contentWidth + widget.padding.horizontal,
+                  contentInset: widget.contentInset,
                   child: child,
                 );
               },
@@ -192,6 +198,7 @@ class _ChartScrollViewState extends State<ChartScrollView> {
                 ChartScrollSection(
                   position: position,
                   contentWidth: widget.contentWidth + widget.padding.horizontal,
+                  contentInset: widget.contentInset,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -203,6 +210,7 @@ class _ChartScrollViewState extends State<ChartScrollView> {
                 ChartScrollSection(
                   position: position,
                   contentWidth: widget.contentWidth + widget.padding.horizontal,
+                  contentInset: widget.contentInset,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -219,12 +227,14 @@ class _ChartScrollViewState extends State<ChartScrollView> {
 class ChartScrollSection extends StatelessWidget {
   final ViewportOffset position;
   final double contentWidth;
+  final double contentInset;
   final Widget child;
 
   const ChartScrollSection({
     super.key,
     required this.position,
     required this.contentWidth,
+    required this.contentInset,
     required this.child,
   });
 
@@ -238,7 +248,7 @@ class ChartScrollSection extends StatelessWidget {
         SliverToBoxAdapter(
           child: Padding(
             // TODO: More logical padding to add a full viewports width?
-            padding: const EdgeInsets.only(right: 1000),
+            padding: EdgeInsets.only(left: contentInset, right: 1000),
             child: SizedBox(
               width: contentWidth,
               child: child,
