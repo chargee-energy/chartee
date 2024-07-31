@@ -22,7 +22,7 @@ class ScrollableChart extends StatelessWidget {
   final Labels? rightLabels;
   final Labels? topLabels;
   final Labels? bottomLabels;
-  final ValueChanged<List<ChartItem>>? onSelectionChanged;
+  final ValueChanged<double?>? onSelectionChanged;
   final BoundsAdjuster adjustBounds;
   final IntervalsProvider Function(BoundingBox bounds, List<ChartItem> items)
       xIntervalsProvider;
@@ -84,6 +84,7 @@ class ScrollableChart extends StatelessWidget {
         rightLabels: rightLabels,
         topLabels: topLabels,
         bottomLabels: bottomLabels,
+        onSelectionChanged: onSelectionChanged,
       ),
     );
   }
@@ -103,6 +104,7 @@ class ChartScrollView extends StatefulWidget {
   final Widget? rightLabels;
   final Widget? topLabels;
   final Widget? bottomLabels;
+  final ValueChanged<double?>? onSelectionChanged;
 
   const ChartScrollView({
     super.key,
@@ -119,6 +121,7 @@ class ChartScrollView extends StatefulWidget {
     required this.rightLabels,
     required this.topLabels,
     required this.bottomLabels,
+    required this.onSelectionChanged,
   });
 
   @override
@@ -179,6 +182,7 @@ class _ChartScrollViewState extends State<ChartScrollView> {
     );
 
     if (nearestX != _selectedX) {
+      widget.onSelectionChanged?.call(nearestX);
       setState(() {
         _selectedX = nearestX;
       });
