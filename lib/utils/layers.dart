@@ -34,9 +34,10 @@ Widget getLayerWidget(
         ),
       ChartSelectionLayer(
         :final builder,
-        :final sticky,
+        :final isSticky,
         :final translation,
-        :final initialSelectedX
+        :final initialSelectedX,
+        :final isStatic,
       ) =>
         ChartSelection(
           padding: padding,
@@ -44,8 +45,9 @@ Widget getLayerWidget(
           selectedX: selectedX,
           initialSelectedX: initialSelectedX,
           builder: builder,
-          sticky: sticky,
+          isSticky: isSticky,
           translation: translation,
+          isStatic: isStatic,
         ),
       ChartLineLayer(
         :final items,

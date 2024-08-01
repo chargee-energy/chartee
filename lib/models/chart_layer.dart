@@ -26,7 +26,7 @@ sealed class ChartLayer with EquatableMixin {
   const ChartLayer();
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [bounds, isStatic];
 }
 
 /// Helper class to create grid layers
@@ -98,7 +98,7 @@ class ChartSelectionLayer extends ChartLayer {
   final SelectionOverlayBuilder builder;
 
   /// A flag indicating if the selection is sticky.
-  final bool sticky;
+  final bool isSticky;
 
   /// The translation value for the selection.
   final double translation;
@@ -110,23 +110,24 @@ class ChartSelectionLayer extends ChartLayer {
   BoundingBox get bounds => const BoundingBox.flexible();
 
   @override
-  bool get isStatic => false;
+  final bool isStatic;
 
   /// Creates a new instance of ChartSelectionLayer.
   ///
-  /// The [builder] is required, while [sticky], [translation], and [initialSelectedX] have default values.
+  /// The [builder] is required, while [isSticky], [translation], and [initialSelectedX] have default values.
   const ChartSelectionLayer({
     required this.builder,
-    this.sticky = false,
+    this.isSticky = false,
     this.translation = 0.0,
     this.initialSelectedX,
+    this.isStatic = false,
   });
 
   @override
   List<Object?> get props => [
         ...super.props,
         builder,
-        sticky,
+        isSticky,
         translation,
         initialSelectedX,
       ];

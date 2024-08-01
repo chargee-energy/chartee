@@ -13,8 +13,9 @@ class ChartSelection extends StatefulWidget {
   final double? selectedX;
   final double? initialSelectedX;
   final SelectionOverlayBuilder builder;
-  final bool sticky;
+  final bool isSticky;
   final double translation;
+  final bool isStatic;
 
   const ChartSelection({
     super.key,
@@ -23,8 +24,9 @@ class ChartSelection extends StatefulWidget {
     required this.selectedX,
     required this.initialSelectedX,
     required this.builder,
-    required this.sticky,
+    required this.isSticky,
     required this.translation,
+    required this.isStatic,
   });
 
   @override
@@ -37,7 +39,7 @@ class _ChartSelectionState extends State<ChartSelection> {
   @override
   void initState() {
     super.initState();
-    if (widget.sticky) {
+    if (widget.isSticky) {
       _selectedX = widget.initialSelectedX;
     } else {
       _selectedX = widget.selectedX;
@@ -49,7 +51,7 @@ class _ChartSelectionState extends State<ChartSelection> {
     super.didUpdateWidget(oldWidget);
     if (widget.selectedX != null) {
       _selectedX = widget.selectedX;
-    } else if (!widget.sticky) {
+    } else if (!widget.isSticky) {
       _selectedX = null;
     }
   }
@@ -75,6 +77,7 @@ class _ChartSelectionState extends State<ChartSelection> {
                   translation: widget.translation,
                   containWithinParent: child.containWithinParent,
                   fullWidth: child.fullWidth,
+                  isStatic: widget.isStatic,
                 ),
                 child: child.widget,
               ),
@@ -83,6 +86,7 @@ class _ChartSelectionState extends State<ChartSelection> {
                   padding: widget.padding,
                   fraction: fraction,
                   translation: widget.translation,
+                  isStatic: widget.isStatic,
                   children: children,
                 ),
                 children: children
@@ -109,6 +113,7 @@ class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
   final double translation;
   final bool containWithinParent;
   final bool fullWidth;
+  final bool isStatic;
 
   const _SingleChildLayoutDelegate({
     required this.padding,
@@ -116,6 +121,7 @@ class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
     required this.translation,
     required this.containWithinParent,
     required this.fullWidth,
+    required this.isStatic,
   });
 
   @override
@@ -138,6 +144,7 @@ class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
         containWithinParent,
         fullWidth,
         padding,
+        isStatic,
       ) +
       Offset(0, childSize.height * translation);
 }
@@ -146,12 +153,14 @@ class _ColumnLayoutDelegate extends MultiChildLayoutDelegate {
   final EdgeInsets padding;
   final double fraction;
   final double translation;
+  final bool isStatic;
   final List<SelectionOverlayItem> children;
 
   _ColumnLayoutDelegate({
     required this.padding,
     required this.fraction,
     required this.translation,
+    required this.isStatic,
     required this.children,
   });
 
@@ -179,6 +188,7 @@ class _ColumnLayoutDelegate extends MultiChildLayoutDelegate {
               containWithinParent,
               fullWidth,
               padding,
+              isStatic,
             ) +
             Offset(0, top),
       );
@@ -207,8 +217,9 @@ Offset _getOffset(
   bool containWithinParent,
   bool fullWidth,
   EdgeInsets padding,
+  bool isStatic,
 ) {
-  if (fullWidth) {
+  if (fullWidth || isStatic) {
     return Offset.zero;
   }
 
