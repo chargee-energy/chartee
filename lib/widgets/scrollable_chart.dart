@@ -463,18 +463,12 @@ class ScrollableChartController extends ScrollController {
     required List<ChartItem> items,
     required double contentWidth,
   }) {
-    assert(
-      _bounds == null && _items == null && _contentWidth == null,
-      'ScrollableChartController can only be initialized once',
-    );
-
     _bounds = bounds;
     _items = items;
     _contentWidth = contentWidth;
   }
 
   void reset() {
-    _ensureInitialized();
     _bounds = null;
     _items = null;
     _contentWidth = null;
