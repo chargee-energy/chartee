@@ -1,3 +1,11 @@
+## 1.0.10
+
+- Added `ScrollableChart` widget to create charts that can scroll horizontally
+- Added `isStatic` property to chart layers to determine if they should scroll or stay in place in a `ScrollableChart`
+- **Breaking change**: Because grid layers are split up in separate vertical and horizontal layers `ChartGridLayer.all` returns a list of 2 layers now instead of a single layer
+- **Breaking change**: Chart selections are no longer based on `ChartItem`, they work purely with `x` values now
+- **Breaking change**: The property `sticky` of `ChartSelectionLayer` is renamed to `isSticky` to be consistent with the added `isStatic` property on all layers
+
 ## 1.0.9
 
 - Make font size of labels adjustable through OS accessibility settings
