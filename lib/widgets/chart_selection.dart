@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/bounding_box.dart';
-import '../models/chart_item.dart';
 import '../models/selection_overlay.dart';
 import '../models/selection_overlay_builder.dart';
 import '../models/selection_overlay_item.dart';
@@ -11,21 +10,23 @@ import '../models/selection_overlay_item.dart';
 class ChartSelection extends StatefulWidget {
   final EdgeInsets padding;
   final BoundingBox bounds;
-  final List<ChartItem> items;
-  final List<ChartItem> initialItems;
+  final double? selectedX;
+  final double? initialSelectedX;
   final SelectionOverlayBuilder builder;
-  final bool sticky;
+  final bool isSticky;
   final double translation;
+  final bool isStatic;
 
   const ChartSelection({
     super.key,
     required this.padding,
     required this.bounds,
-    required this.items,
-    required this.initialItems,
+    required this.selectedX,
+    required this.initialSelectedX,
     required this.builder,
-    required this.sticky,
+    required this.isSticky,
     required this.translation,
+    required this.isStatic,
   });
 
   @override
@@ -33,72 +34,76 @@ class ChartSelection extends StatefulWidget {
 }
 
 class _ChartSelectionState extends State<ChartSelection> {
-  List<ChartItem> _items = [];
+  double? _selectedX;
 
   @override
   void initState() {
     super.initState();
-    if (widget.sticky) {
-      _items = widget.initialItems;
+    if (widget.isSticky) {
+      _selectedX = widget.initialSelectedX;
+    } else {
+      _selectedX = widget.selectedX;
     }
   }
 
   @override
   void didUpdateWidget(covariant ChartSelection oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    if (widget.items.isNotEmpty) {
-      _items = widget.items;
-    } else if (!widget.sticky) {
-      _items = [];
+    if (widget.selectedX != null) {
+      _selectedX = widget.selectedX;
+    } else if (!widget.isSticky) {
+      _selectedX = null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_items.isEmpty) {
-      return const SizedBox.shrink();
+    if (_selectedX case final x?) {
+      final overlay = widget.builder(x);
+      final fraction = widget.bounds.getFractionX(x);
+
+      return RepaintBoundary(
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: widget.padding.top,
+            bottom: widget.padding.bottom,
+          ),
+          child: switch (overlay) {
+            SingleChildSelectionOverlay(:final child) =>
+              CustomSingleChildLayout(
+                delegate: _SingleChildLayoutDelegate(
+                  padding: widget.padding,
+                  fraction: fraction,
+                  translation: widget.translation,
+                  containWithinParent: child.containWithinParent,
+                  fullWidth: child.fullWidth,
+                  isStatic: widget.isStatic,
+                ),
+                child: child.widget,
+              ),
+            ColumnSelectionOverlay(:final children) => CustomMultiChildLayout(
+                delegate: _ColumnLayoutDelegate(
+                  padding: widget.padding,
+                  fraction: fraction,
+                  translation: widget.translation,
+                  isStatic: widget.isStatic,
+                  children: children,
+                ),
+                children: children
+                    .mapIndexed(
+                      (index, child) => LayoutId(
+                        id: index,
+                        child: child.widget,
+                      ),
+                    )
+                    .toList(),
+              ),
+          },
+        ),
+      );
     }
 
-    final overlay = widget.builder(_items);
-    final fraction = widget.bounds.getFractionX(_items.first.x);
-
-    return RepaintBoundary(
-      child: Padding(
-        padding: EdgeInsets.only(
-          top: widget.padding.top,
-          bottom: widget.padding.bottom,
-        ),
-        child: switch (overlay) {
-          SingleChildSelectionOverlay(:final child) => CustomSingleChildLayout(
-              delegate: _SingleChildLayoutDelegate(
-                padding: widget.padding,
-                fraction: fraction,
-                translation: widget.translation,
-                containWithinParent: child.containWithinParent,
-                fullWidth: child.fullWidth,
-              ),
-              child: child.widget,
-            ),
-          ColumnSelectionOverlay(:final children) => CustomMultiChildLayout(
-              delegate: _ColumnLayoutDelegate(
-                padding: widget.padding,
-                fraction: fraction,
-                translation: widget.translation,
-                children: children,
-              ),
-              children: children
-                  .mapIndexed(
-                    (index, child) => LayoutId(
-                      id: index,
-                      child: child.widget,
-                    ),
-                  )
-                  .toList(),
-            ),
-        },
-      ),
-    );
+    return const SizedBox.shrink();
   }
 }
 
@@ -108,6 +113,7 @@ class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
   final double translation;
   final bool containWithinParent;
   final bool fullWidth;
+  final bool isStatic;
 
   const _SingleChildLayoutDelegate({
     required this.padding,
@@ -115,6 +121,7 @@ class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
     required this.translation,
     required this.containWithinParent,
     required this.fullWidth,
+    required this.isStatic,
   });
 
   @override
@@ -137,6 +144,7 @@ class _SingleChildLayoutDelegate extends SingleChildLayoutDelegate {
         containWithinParent,
         fullWidth,
         padding,
+        isStatic,
       ) +
       Offset(0, childSize.height * translation);
 }
@@ -145,12 +153,14 @@ class _ColumnLayoutDelegate extends MultiChildLayoutDelegate {
   final EdgeInsets padding;
   final double fraction;
   final double translation;
+  final bool isStatic;
   final List<SelectionOverlayItem> children;
 
   _ColumnLayoutDelegate({
     required this.padding,
     required this.fraction,
     required this.translation,
+    required this.isStatic,
     required this.children,
   });
 
@@ -178,6 +188,7 @@ class _ColumnLayoutDelegate extends MultiChildLayoutDelegate {
               containWithinParent,
               fullWidth,
               padding,
+              isStatic,
             ) +
             Offset(0, top),
       );
@@ -206,8 +217,9 @@ Offset _getOffset(
   bool containWithinParent,
   bool fullWidth,
   EdgeInsets padding,
+  bool isStatic,
 ) {
-  if (fullWidth) {
+  if (fullWidth || isStatic) {
     return Offset.zero;
   }
 

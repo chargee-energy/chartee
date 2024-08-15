@@ -1,17 +1,15 @@
-import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
+import '../utils/items.dart';
 
 class ChartGestureHandler extends StatefulWidget {
   final EdgeInsets padding;
   final BoundingBox bounds;
   final List<ChartItem> items;
-  final ValueChanged<List<ChartItem>>? onSelectionChanged;
-  final Widget Function(BuildContext context, List<ChartItem> selectedItems)
-      builder;
+  final ValueChanged<double?>? onSelectionChanged;
+  final Widget Function(BuildContext context, double? selectedX) builder;
 
   const ChartGestureHandler({
     super.key,
@@ -27,47 +25,34 @@ class ChartGestureHandler extends StatefulWidget {
 }
 
 class _ChartGestureHandlerState extends State<ChartGestureHandler> {
-  List<ChartItem> _selectedItems = [];
+  double? _selectedX;
 
-  List<ChartItem> _findItemsForOffset(Offset localPosition) {
+  double? _findNearestX(Offset localPosition) {
     if (widget.items.isEmpty) {
-      return [];
+      return null;
     }
 
     final renderBox = context.findRenderObject() as RenderBox;
     final width = renderBox.size.width - widget.padding.horizontal;
     final x = localPosition.dx - widget.padding.left;
-    final fractionX = x / width;
 
-    final distances = widget.items
-        .map(
-          (item) => (
-            item: item,
-            distance: (fractionX - widget.bounds.getFractionX(item.x)).abs(),
-          ),
-        )
-        .sorted((a, b) => ((a.distance - b.distance) * 100).toInt());
-
-    return distances
-        .map((distance) => distance.item)
-        .where((item) => item.x == distances.first.item.x)
-        .toList();
+    return nearestXForOffset(widget.bounds, widget.items, x, width);
   }
 
-  void _setSelectedItems(List<ChartItem> items) {
-    if (!listEquals(_selectedItems, items)) {
-      widget.onSelectionChanged?.call(items);
+  void _setSelectedX(double? x) {
+    if (x != _selectedX) {
+      widget.onSelectionChanged?.call(x);
       setState(() {
-        _selectedItems = items;
+        _selectedX = x;
       });
     }
   }
 
   void _resetSelectedItems() {
-    if (_selectedItems.isNotEmpty) {
-      widget.onSelectionChanged?.call([]);
+    if (_selectedX != null) {
+      widget.onSelectionChanged?.call(null);
       setState(() {
-        _selectedItems = [];
+        _selectedX = null;
       });
     }
   }
@@ -77,17 +62,17 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTapDown: (details) {
-        final items = _findItemsForOffset(details.localPosition);
-        _setSelectedItems(items);
+        final items = _findNearestX(details.localPosition);
+        _setSelectedX(items);
       },
       onTapUp: (_) => _resetSelectedItems(),
       onHorizontalDragUpdate: (details) {
-        final items = _findItemsForOffset(details.localPosition);
-        _setSelectedItems(items);
+        final items = _findNearestX(details.localPosition);
+        _setSelectedX(items);
       },
       onHorizontalDragEnd: (_) => _resetSelectedItems(),
       onHorizontalDragCancel: () => _resetSelectedItems(),
-      child: widget.builder(context, _selectedItems),
+      child: widget.builder(context, _selectedX),
     );
   }
 }

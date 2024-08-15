@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -8,10 +6,9 @@ import '../models/chart_item.dart';
 import '../models/chart_layer.dart';
 import '../models/labels.dart';
 import '../utils/chart.dart';
+import '../utils/layers.dart';
+import 'chart_base.dart';
 import 'chart_gesture_handler.dart';
-import 'chart_layer_stack.dart';
-import 'chart_x_labels.dart';
-import 'chart_y_labels.dart';
 
 class Chart extends StatelessWidget {
   final List<ChartLayer> layers;
@@ -20,7 +17,7 @@ class Chart extends StatelessWidget {
   final Labels? rightLabels;
   final Labels? topLabels;
   final Labels? bottomLabels;
-  final ValueChanged<List<ChartItem>>? onSelectionChanged;
+  final ValueChanged<double?>? onSelectionChanged;
   final BoundsAdjuster adjustBounds;
   final IntervalsProvider Function(BoundingBox bounds, List<ChartItem> items)
       xIntervalsProvider;
@@ -43,186 +40,53 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bounds =
-        adjustBounds(BoundingBox.merge(layers.map((layer) => layer.bounds)));
-
-    final items = layers
-        .whereType<ChartItemLayer>()
-        .fold(<ChartItem>[], (result, layer) => [...result, ...layer.items]);
-
-    final xIntervals = xIntervalsProvider(bounds, items);
-    final yIntervals = yIntervalsProvider(bounds, items);
-
-    final intervalsAdjustedBounds = BoundingBox.merge(
-      [
-        xIntervals.adjustedBounds,
-        yIntervals.adjustedBounds,
-      ],
-    );
-
-    final topLabelValues = _getLabelValues(
-      context,
-      topLabels,
-      xIntervals.intervals,
-      intervalsAdjustedBounds.getFractionX,
-    );
-
-    final bottomLabelValues = _getLabelValues(
-      context,
-      bottomLabels,
-      xIntervals.intervals,
-      intervalsAdjustedBounds.getFractionX,
-    );
-
-    final leftLabelValues = _getLabelValues(
-      context,
-      leftLabels,
-      yIntervals.intervals,
-      intervalsAdjustedBounds.getFractionY,
-    );
-
-    final rightLabelValues = _getLabelValues(
-      context,
-      rightLabels,
-      yIntervals.intervals,
-      intervalsAdjustedBounds.getFractionY,
-    );
-
-    final topLabelsSize = _getLargestLabelSize(topLabels, topLabelValues);
-    final bottomLabelsSize =
-        _getLargestLabelSize(bottomLabels, bottomLabelValues);
-    final leftLabelsSize = _getLargestLabelSize(leftLabels, leftLabelValues);
-    final rightLabelsSize = _getLargestLabelSize(rightLabels, rightLabelValues);
-
-    final contentPadding = padding +
-        EdgeInsets.fromLTRB(
-          leftLabelsSize.width,
-          topLabelsSize.height,
-          rightLabelsSize.width,
-          bottomLabelsSize.height,
-        );
-
-    return ChartGestureHandler(
-      padding: contentPadding,
-      bounds: intervalsAdjustedBounds,
-      items: items,
-      onSelectionChanged: onSelectionChanged,
-      builder: (context, selectedItems) => ChartLayerStack(
+    return ChartBase(
+      layers: layers,
+      padding: padding,
+      leftLabels: leftLabels,
+      rightLabels: rightLabels,
+      topLabels: topLabels,
+      bottomLabels: bottomLabels,
+      adjustBounds: adjustBounds,
+      xIntervalsProvider: xIntervalsProvider,
+      yIntervalsProvider: yIntervalsProvider,
+      builder: (
+        context,
+        bounds,
+        items,
+        contentPadding,
+        xIntervals,
+        yIntervals,
+        leftLabels,
+        rightLabels,
+        topLabels,
+        bottomLabels,
+      ) =>
+          ChartGestureHandler(
         padding: contentPadding,
-        bounds: intervalsAdjustedBounds,
-        xIntervals: xIntervals.intervals,
-        yIntervals: yIntervals.intervals,
-        layers: layers,
-        selectedItems: selectedItems,
-        labels: [
-          if (topLabels case final labels?
-              when topLabelValues != null && topLabelValues.isNotEmpty)
-            Positioned(
-              left: padding.left + leftLabelsSize.width,
-              right: padding.right + rightLabelsSize.width,
-              top: labels.padding.top,
-              height: topLabelsSize.height - labels.padding.vertical,
-              child: ChartXLabels(
-                labels: labels,
-                values: topLabelValues,
-              ),
-            ),
-          if (bottomLabels case final labels?
-              when bottomLabelValues != null && bottomLabelValues.isNotEmpty)
-            Positioned(
-              left: padding.left + leftLabelsSize.width,
-              right: padding.right + rightLabelsSize.width,
-              bottom: labels.padding.bottom,
-              height: bottomLabelsSize.height - labels.padding.vertical,
-              child: ChartXLabels(
-                labels: labels,
-                values: bottomLabelValues,
-              ),
-            ),
-          if (leftLabels case final labels?
-              when leftLabelValues != null && leftLabelValues.isNotEmpty)
-            Positioned(
-              top: padding.top + topLabelsSize.height,
-              bottom: padding.bottom + bottomLabelsSize.height,
-              left: labels.padding.left,
-              width: leftLabelsSize.width - labels.padding.horizontal,
-              child: ChartYLabels(
-                labels: labels,
-                values: leftLabelValues,
-              ),
-            ),
-          if (rightLabels case final labels?
-              when rightLabelValues != null && rightLabelValues.isNotEmpty)
-            Positioned(
-              top: padding.top + topLabelsSize.height,
-              bottom: padding.bottom + bottomLabelsSize.height,
-              right: labels.padding.right,
-              width: rightLabelsSize.width - labels.padding.horizontal,
-              child: ChartYLabels(
-                labels: labels,
-                values: rightLabelValues,
-              ),
-            ),
-        ],
+        bounds: bounds,
+        items: items,
+        onSelectionChanged: onSelectionChanged,
+        builder: (context, selectedX) => Stack(
+          fit: StackFit.expand,
+          children: layers
+                  .map(
+                    (layer) => getLayerWidget(
+                      context,
+                      layer,
+                      bounds,
+                      xIntervals.intervals,
+                      yIntervals.intervals,
+                      selectedX,
+                      contentPadding,
+                    ),
+                  )
+                  .toList() +
+              [leftLabels, rightLabels, topLabels, bottomLabels]
+                  .whereNotNull()
+                  .toList(),
+        ),
       ),
-    );
-  }
-
-  List<({double fraction, TextPainter painter})>? _getLabelValues(
-    BuildContext context,
-    Labels? labels,
-    List<double> intervals,
-    double Function(double) getFraction,
-  ) =>
-      labels != null
-          ? intervals
-              .mapIndexed(
-                (index, interval) {
-                  final text =
-                      labels.getLabelText?.call(index, interval.toDouble());
-
-                  if (text == null) {
-                    return null;
-                  }
-
-                  final painter = TextPainter(
-                    text: TextSpan(text: text, style: labels.style),
-                    textAlign: labels.textAlign,
-                    textDirection: TextDirection.ltr,
-                    textScaler: MediaQuery.textScalerOf(context),
-                  )..layout();
-
-                  return (
-                    fraction: getFraction(interval),
-                    painter: painter,
-                  );
-                },
-              )
-              .whereNotNull()
-              .toList()
-          : null;
-
-  Size _getLargestLabelSize(
-    Labels? labels,
-    List<({double fraction, TextPainter painter})>? values,
-  ) {
-    if (values == null) {
-      return Size.zero;
-    }
-
-    final horizontalPadding = labels?.padding.horizontal ?? 0;
-    final verticalPadding = labels?.padding.vertical ?? 0;
-    final largestLabelSize = values.map((value) => value.painter.size).fold(
-          Size.zero,
-          (result, size) => Size(
-            max(result.width, size.width),
-            max(result.height, size.height),
-          ),
-        );
-
-    return Size(
-      largestLabelSize.width + horizontalPadding,
-      largestLabelSize.height + verticalPadding,
     );
   }
 }

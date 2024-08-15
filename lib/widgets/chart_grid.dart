@@ -5,70 +5,59 @@ import '../models/bounding_box.dart';
 import '../models/grid_line.dart';
 import '../utils/path.dart';
 
-class ChartGrid extends StatelessWidget {
+class HorizontalChartGridLines extends StatelessWidget {
   final EdgeInsets padding;
   final BoundingBox bounds;
-  final List<double> xIntervals;
-  final List<double> yIntervals;
-  final GridLineBuilder? horizontalLineBuilder;
-  final GridLineBuilder? verticalLineBuilder;
+  final List<double> intervals;
+  final GridLineBuilder lineBuilder;
 
-  const ChartGrid({
+  const HorizontalChartGridLines({
     super.key,
     required this.padding,
     required this.bounds,
-    required this.xIntervals,
-    required this.yIntervals,
-    this.horizontalLineBuilder,
-    this.verticalLineBuilder,
+    required this.intervals,
+    required this.lineBuilder,
   });
 
   @override
   Widget build(BuildContext context) {
-    final painters = <CustomPainter>[];
-
-    if (horizontalLineBuilder case final horizontalLineBuilder?) {
-      painters.add(
-        _GridLinesPainter(
-          axis: Axis.horizontal,
-          bounds: bounds,
-          intervals: yIntervals,
-          lineBuilder: horizontalLineBuilder,
-          padding: padding,
-        ),
-      );
-    }
-
-    if (verticalLineBuilder case final verticalLineBuilder?) {
-      painters.add(
-        _GridLinesPainter(
-          axis: Axis.vertical,
-          bounds: bounds,
-          intervals: xIntervals,
-          lineBuilder: verticalLineBuilder,
-          padding: padding,
-        ),
-      );
-    }
-
-    return CustomPaint(painter: _GridPainter(children: painters));
+    return CustomPaint(
+      painter: _GridLinesPainter(
+        axis: Axis.horizontal,
+        bounds: bounds,
+        intervals: intervals,
+        lineBuilder: lineBuilder,
+        padding: padding,
+      ),
+    );
   }
 }
 
-class _GridPainter extends CustomPainter {
-  final List<CustomPainter> children;
+class VerticalChartGridLines extends StatelessWidget {
+  final EdgeInsets padding;
+  final BoundingBox bounds;
+  final List<double> intervals;
+  final GridLineBuilder lineBuilder;
 
-  const _GridPainter({required this.children});
+  const VerticalChartGridLines({
+    super.key,
+    required this.padding,
+    required this.bounds,
+    required this.intervals,
+    required this.lineBuilder,
+  });
 
   @override
-  bool shouldRepaint(covariant _GridPainter oldDelegate) =>
-      !listEquals(children, oldDelegate.children);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    for (final child in children) {
-      child.paint(canvas, size);
-    }
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _GridLinesPainter(
+        axis: Axis.vertical,
+        bounds: bounds,
+        intervals: intervals,
+        lineBuilder: lineBuilder,
+        padding: padding,
+      ),
+    );
   }
 }
 

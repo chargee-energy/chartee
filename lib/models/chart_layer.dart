@@ -19,48 +19,75 @@ sealed class ChartLayer with EquatableMixin {
   /// Returns the bounding box of the chart layer.
   BoundingBox get bounds;
 
+  /// Whether the layer should remain static in a scrollable chart
+  bool get isStatic;
+
   /// Creates a new instance of ChartLayer.
   const ChartLayer();
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [bounds, isStatic];
 }
 
-/// Represents a layer in a chart that displays grid lines.
-///
-/// This class extends [ChartLayer] and provides properties for horizontal and vertical grid line builders.
-class ChartGridLayer extends ChartLayer {
-  /// The builder for horizontal grid lines.
-  final GridLineBuilder? horizontalLineBuilder;
+/// Helper class to create grid layers
+abstract final class ChartGridLayer {
+  /// Creates a list with new instances of ChartHorizontalGridLineLayer and ChartVerticalGridLineLayer.
+  static List<ChartLayer> all({
+    required GridLineBuilder horizontalLineBuilder,
+    required GridLineBuilder verticalLineBuilder,
+  }) =>
+      [
+        ChartHorizontalGridLineLayer(horizontalLineBuilder),
+        ChartVerticalGridLineLayer(verticalLineBuilder),
+      ];
 
-  /// The builder for vertical grid lines.
-  final GridLineBuilder? verticalLineBuilder;
+  /// Creates a new instance of ChartHorizontalGridLineLayer.
+  static ChartLayer horizontal(GridLineBuilder lineBuilder) =>
+      ChartHorizontalGridLineLayer(lineBuilder);
+
+  /// Creates a new instance of ChartVerticalGridLineLayer.
+  static ChartLayer vertical(GridLineBuilder lineBuilder) =>
+      ChartVerticalGridLineLayer(lineBuilder);
+}
+
+/// Represents a layer in a chart that displays horizontal grid lines.
+///
+/// This class extends [ChartLayer] and provides a property for horizontal grid line builder.
+class ChartHorizontalGridLineLayer extends ChartLayer {
+  /// The builder for grid lines.
+  final GridLineBuilder lineBuilder;
 
   @override
   BoundingBox get bounds => const BoundingBox.flexible();
 
-  /// Creates a new instance of ChartGridLayer with both horizontal and vertical line builders.
-  ///
-  /// Either [horizontalLineBuilder] or [verticalLineBuilder] can be null based on the type of grid layer.
-  const ChartGridLayer.all({
-    required this.horizontalLineBuilder,
-    required this.verticalLineBuilder,
-  });
+  @override
+  bool get isStatic => true;
 
-  /// Creates a new instance of ChartGridLayer with only horizontal grid lines.
-  const ChartGridLayer.horizontal(this.horizontalLineBuilder)
-      : verticalLineBuilder = null;
-
-  /// Creates a new instance of ChartGridLayer with only vertical grid lines.
-  const ChartGridLayer.vertical(this.verticalLineBuilder)
-      : horizontalLineBuilder = null;
+  /// Creates a new instance of ChartHorizontalGridLineLayer with the provided line builder
+  const ChartHorizontalGridLineLayer(this.lineBuilder);
 
   @override
-  List<Object?> get props => [
-        ...super.props,
-        horizontalLineBuilder,
-        verticalLineBuilder,
-      ];
+  List<Object?> get props => [...super.props, lineBuilder];
+}
+
+/// Represents a layer in a chart that displays vertical grid lines.
+///
+/// This class extends [ChartLayer] and provides a property for vertical grid line builder.
+class ChartVerticalGridLineLayer extends ChartLayer {
+  /// The builder for grid lines.
+  final GridLineBuilder lineBuilder;
+
+  @override
+  BoundingBox get bounds => const BoundingBox.flexible();
+
+  @override
+  bool get isStatic => false;
+
+  /// Creates a new instance of ChartVerticalGridLineLayer with the provided line builder
+  const ChartVerticalGridLineLayer(this.lineBuilder);
+
+  @override
+  List<Object?> get props => [...super.props, lineBuilder];
 }
 
 /// Represents a layer in a chart that handles selection overlay.
@@ -71,34 +98,38 @@ class ChartSelectionLayer extends ChartLayer {
   final SelectionOverlayBuilder builder;
 
   /// A flag indicating if the selection is sticky.
-  final bool sticky;
+  final bool isSticky;
 
   /// The translation value for the selection.
   final double translation;
 
-  /// The initial items selected in the chart.
-  final List<ChartItem> initialItems;
+  /// The initial x selected in the chart.
+  final double? initialSelectedX;
 
   @override
   BoundingBox get bounds => const BoundingBox.flexible();
 
+  @override
+  final bool isStatic;
+
   /// Creates a new instance of ChartSelectionLayer.
   ///
-  /// The [builder] is required, while [sticky], [translation], and [initialItems] have default values.
+  /// The [builder] is required, while [isSticky], [translation], and [initialSelectedX] have default values.
   const ChartSelectionLayer({
     required this.builder,
-    this.sticky = false,
+    this.isSticky = false,
     this.translation = 0.0,
-    this.initialItems = const [],
+    this.initialSelectedX,
+    this.isStatic = false,
   });
 
   @override
   List<Object?> get props => [
         ...super.props,
         builder,
-        sticky,
+        isSticky,
         translation,
-        initialItems,
+        initialSelectedX,
       ];
 }
 
@@ -113,6 +144,9 @@ sealed class ChartItemLayer<Item extends ChartItem> extends ChartLayer {
 
   @override
   BoundingBox get bounds => BoundingBox.merge(items.map((item) => item.bounds));
+
+  @override
+  bool get isStatic => false;
 
   /// Creates a new instance of ChartItemLayer with the provided list of items.
   const ChartItemLayer({required this.items});
@@ -208,6 +242,9 @@ class ChartCursorLayer extends ChartLayer {
   @override
   BoundingBox get bounds => const BoundingBox.flexible();
 
+  @override
+  bool get isStatic => false;
+
   /// Creates a new instance of ChartCursorLayer with the specified cursor builder and position.
   ///
   /// The [builder] parameter is required and represents the builder for the cursor.
@@ -228,6 +265,9 @@ class ChartCustomLayer extends ChartLayer {
   @override
   final BoundingBox bounds;
 
+  @override
+  final bool isStatic;
+
   /// Creates a new instance of ChartCustomLayer with the specified widget builder and bounds.
   ///
   /// The [builder] parameter is required and represents the builder for the widget.
@@ -235,6 +275,7 @@ class ChartCustomLayer extends ChartLayer {
   const ChartCustomLayer({
     required this.builder,
     this.bounds = const BoundingBox.flexible(),
+    this.isStatic = false,
   });
 
   @override

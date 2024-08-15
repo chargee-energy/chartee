@@ -13,3 +13,4 @@ export 'models/selection_overlay.dart';
 export 'utils/chart.dart';
 
 export 'widgets/chart.dart';
+export 'widgets/scrollable_chart.dart';
