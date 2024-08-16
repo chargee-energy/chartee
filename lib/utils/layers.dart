@@ -9,6 +9,7 @@ import '../widgets/chart_grid.dart';
 import '../widgets/chart_line.dart';
 import '../widgets/chart_selection.dart';
 
+// TODO: Support onXPressed on line and area
 Widget getLayerWidget(
   BuildContext context,
   ChartLayer layer,
@@ -16,8 +17,9 @@ Widget getLayerWidget(
   List<double> xIntervals,
   List<double> yIntervals,
   double? selectedX,
-  EdgeInsets padding,
-) =>
+  EdgeInsets padding, {
+  ValueChanged<double>? onXPressed,
+}) =>
     switch (layer) {
       ChartHorizontalGridLineLayer(:final lineBuilder) =>
         HorizontalChartGridLines(
@@ -88,6 +90,9 @@ Widget getLayerWidget(
             barStacks: items,
             selectedBarStacks:
                 items.where((item) => item.x == selectedX).toList(),
+            onBarStackPressed: onXPressed != null
+                ? (barStack) => onXPressed(barStack.x)
+                : null,
           ),
         ),
       ChartCursorLayer(:final builder, :final point) => Padding(

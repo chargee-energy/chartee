@@ -8,6 +8,14 @@ double? nearestXForOffset(
   List<ChartItem> items,
   double offset,
   double width,
+) =>
+    nearestItemForOffset(bounds, items, offset, width)?.x;
+
+Item? nearestItemForOffset<Item extends ChartItem>(
+  BoundingBox bounds,
+  List<Item> items,
+  double offset,
+  double width,
 ) {
   if (items.isEmpty) {
     return null;
@@ -23,5 +31,5 @@ double? nearestXForOffset(
       )
       .sorted((a, b) => ((a.distance - b.distance) * 100).toInt());
 
-  return distances.first.item.x;
+  return distances.first.item;
 }

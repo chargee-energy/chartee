@@ -62,13 +62,13 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTapDown: (details) {
-        final items = _findNearestX(details.localPosition);
-        _setSelectedX(items);
+        final x = _findNearestX(details.localPosition);
+        _setSelectedX(x);
       },
       onTapUp: (_) => _resetSelectedItems(),
       onHorizontalDragUpdate: (details) {
-        final items = _findNearestX(details.localPosition);
-        _setSelectedX(items);
+        final x = _findNearestX(details.localPosition);
+        _setSelectedX(x);
       },
       onHorizontalDragEnd: (_) => _resetSelectedItems(),
       onHorizontalDragCancel: () => _resetSelectedItems(),

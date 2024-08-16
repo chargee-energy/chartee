@@ -23,6 +23,7 @@ class ScrollableChart extends StatelessWidget {
   final Labels? topLabels;
   final Labels? bottomLabels;
   final ValueChanged<double?>? onSelectionChanged;
+  final ValueChanged<double>? onXPressed;
   final BoundsAdjuster adjustBounds;
   final IntervalsProvider Function(BoundingBox bounds, List<ChartItem> items)
       xIntervalsProvider;
@@ -41,6 +42,7 @@ class ScrollableChart extends StatelessWidget {
     this.topLabels,
     this.bottomLabels,
     this.onSelectionChanged,
+    this.onXPressed,
     this.adjustBounds = AdjustBounds.noAdjustment,
     this.xIntervalsProvider = OutlineXIntervals.create,
     this.yIntervalsProvider = OutlineYIntervals.create,
@@ -85,6 +87,7 @@ class ScrollableChart extends StatelessWidget {
         topLabels: topLabels,
         bottomLabels: bottomLabels,
         onSelectionChanged: onSelectionChanged,
+        onXPressed: onXPressed,
       ),
     );
   }
@@ -105,6 +108,7 @@ class ChartScrollView extends StatefulWidget {
   final Widget? topLabels;
   final Widget? bottomLabels;
   final ValueChanged<double?>? onSelectionChanged;
+  final ValueChanged<double>? onXPressed;
 
   const ChartScrollView({
     super.key,
@@ -122,6 +126,7 @@ class ChartScrollView extends StatefulWidget {
     required this.topLabels,
     required this.bottomLabels,
     required this.onSelectionChanged,
+    required this.onXPressed,
   });
 
   @override
@@ -214,6 +219,7 @@ class _ChartScrollViewState extends State<ChartScrollView> {
                   widget.yIntervals,
                   _selectedX,
                   widget.padding,
+                  onXPressed: widget.onXPressed,
                 );
 
                 if (layer.isStatic) {

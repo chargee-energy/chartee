@@ -3,65 +3,82 @@ import 'package:flutter/material.dart';
 import '../models/bar.dart';
 import '../models/bar_stack.dart';
 import '../models/bounding_box.dart';
+import '../utils/items.dart';
 
 class ChartBars extends StatelessWidget {
   final BoundingBox bounds;
   final List<BarStack> barStacks;
   final List<BarStack> selectedBarStacks;
+  final ValueChanged<BarStack>? onBarStackPressed;
 
   const ChartBars({
     super.key,
     required this.bounds,
     required this.barStacks,
     required this.selectedBarStacks,
+    this.onBarStackPressed,
   });
+
+  BarStack? _findNearestBarStack(BuildContext context, Offset localPosition) {
+    if (barStacks.isEmpty) {
+      return null;
+    }
+
+    final renderBox = context.findRenderObject() as RenderBox;
+    return nearestItemForOffset(
+      bounds,
+      barStacks,
+      localPosition.dx,
+      renderBox.size.width,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: barStacks
-          .map(
-            (barStack) => CustomPaint(
-              painter: _BarStackPainter(
-                bounds: bounds,
-                barStack: barStack,
-                children: barStack.bars
-                    .map(
-                      (bar) => _BarPainter(
-                        bounds: barStack.bounds,
-                        bar: bar,
-                        highlight: selectedBarStacks.contains(barStack),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          )
-          .toList(),
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTapUp: (details) {
+        final barStack = _findNearestBarStack(context, details.localPosition);
+        if (barStack != null) {
+          onBarStackPressed?.call(barStack);
+        }
+      },
+      child: CustomPaint(
+        painter: _BarStacksPainter(
+          bounds: bounds,
+          barStacks: barStacks,
+          selectedBarStacks: selectedBarStacks,
+        ),
+      ),
     );
   }
 }
 
-class _BarStackPainter extends CustomPainter {
+class _BarStacksPainter extends CustomPainter {
   final BoundingBox bounds;
-  final BarStack barStack;
-  final List<CustomPainter> children;
+  final List<BarStack> barStacks;
+  final List<BarStack> selectedBarStacks;
 
-  const _BarStackPainter({
+  const _BarStacksPainter({
     required this.bounds,
-    required this.barStack,
-    required this.children,
+    required this.barStacks,
+    required this.selectedBarStacks,
   });
 
   @override
-  bool shouldRepaint(covariant _BarStackPainter oldDelegate) =>
+  bool shouldRepaint(covariant _BarStacksPainter oldDelegate) =>
       bounds != oldDelegate.bounds ||
-      barStack != oldDelegate.barStack ||
-      children != oldDelegate.children;
+      barStacks != oldDelegate.barStacks ||
+      selectedBarStacks != oldDelegate.selectedBarStacks;
 
   @override
   void paint(Canvas canvas, Size size) {
+    for (final barStack in barStacks) {
+      _paintBarStack(barStack, canvas, size);
+    }
+  }
+
+  void _paintBarStack(BarStack barStack, Canvas canvas, Size size) {
     final centerX = bounds.getFractionX(barStack.x) * size.width;
     final top = bounds.getFractionY(barStack.minY) * size.height;
     final bottom = bounds.getFractionY(barStack.maxY) * size.height;
@@ -84,6 +101,16 @@ class _BarStackPainter extends CustomPainter {
         bottomRight: barStack.borderRadius.bottomRight,
       ),
     );
+
+    final children = barStack.bars
+        .map(
+          (bar) => _BarPainter(
+            bounds: barStack.bounds,
+            bar: bar,
+            highlight: selectedBarStacks.contains(barStack),
+          ),
+        )
+        .toList();
 
     for (final child in children) {
       child.paint(canvas, clipRect.size);
