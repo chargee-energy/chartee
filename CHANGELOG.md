@@ -1,3 +1,7 @@
+## 1.0.11
+
+- Callback when item is pressed in scrollable bar chart
+
 ## 1.0.10
 
 - Added `ScrollableChart` widget to create charts that can scroll horizontally
