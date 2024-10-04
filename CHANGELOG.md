@@ -1,3 +1,7 @@
+## 1.0.12
+
+- Use chargee_lints instead of defining lint rules in library itself
+
 ## 1.0.11
 
 - Callback when item is pressed in scrollable bar chart
