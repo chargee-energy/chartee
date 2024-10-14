@@ -22,12 +22,15 @@ class ChartArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _AreaPainter(
-        bounds: bounds,
-        points: points,
-        positiveColor: positiveColor,
-        negativeColor: negativeColor,
+    return RepaintBoundary(
+      child: CustomPaint(
+        isComplex: true,
+        painter: _AreaPainter(
+          bounds: bounds,
+          points: points,
+          positiveColor: positiveColor,
+          negativeColor: negativeColor,
+        ),
       ),
     );
   }
