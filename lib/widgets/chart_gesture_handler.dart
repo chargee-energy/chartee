@@ -9,7 +9,8 @@ class ChartGestureHandler extends StatefulWidget {
   final BoundingBox bounds;
   final List<ChartItem> items;
   final ValueChanged<double?>? onSelectionChanged;
-  final Widget Function(BuildContext context, double? selectedX) builder;
+  final Widget Function(BuildContext context, ValueNotifier<double?> selectedX)
+      builder;
 
   const ChartGestureHandler({
     super.key,
@@ -25,7 +26,7 @@ class ChartGestureHandler extends StatefulWidget {
 }
 
 class _ChartGestureHandlerState extends State<ChartGestureHandler> {
-  double? _selectedX;
+  final ValueNotifier<double?> _selectedX = ValueNotifier(null);
 
   double? _findNearestX(Offset localPosition) {
     if (widget.items.isEmpty) {
@@ -40,20 +41,17 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
   }
 
   void _setSelectedX(double? x) {
-    if (x != _selectedX) {
+    if (x != _selectedX.value) {
       widget.onSelectionChanged?.call(x);
-      setState(() {
-        _selectedX = x;
-      });
+
+      _selectedX.value = x;
     }
   }
 
   void _resetSelectedItems() {
-    if (_selectedX != null) {
+    if (_selectedX.value != null) {
       widget.onSelectionChanged?.call(null);
-      setState(() {
-        _selectedX = null;
-      });
+      _selectedX.value = null;
     }
   }
 

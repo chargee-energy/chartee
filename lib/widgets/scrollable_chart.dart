@@ -135,13 +135,13 @@ class ChartScrollView extends StatefulWidget {
 
 class _ChartScrollViewState extends State<ChartScrollView> {
   late ScrollableChartController _controller;
-  double? _selectedX;
+  final ValueNotifier<double?> _selectedX = ValueNotifier(null);
 
   @override
   void initState() {
     super.initState();
     _initController();
-    _selectedX = _controller.initialX;
+    _selectedX.value = _controller.initialX;
   }
 
   @override
@@ -186,11 +186,9 @@ class _ChartScrollViewState extends State<ChartScrollView> {
       widget.contentWidth,
     );
 
-    if (nearestX != _selectedX) {
+    if (nearestX != _selectedX.value) {
       widget.onSelectionChanged?.call(nearestX);
-      setState(() {
-        _selectedX = nearestX;
-      });
+      _selectedX.value = nearestX;
     }
   }
 

@@ -16,7 +16,7 @@ Widget getLayerWidget(
   BoundingBox bounds,
   List<double> xIntervals,
   List<double> yIntervals,
-  double? selectedX,
+  ValueNotifier<double?> selectedXNotifier,
   EdgeInsets padding, {
   ValueChanged<double>? onXPressed,
 }) =>
@@ -41,15 +41,18 @@ Widget getLayerWidget(
         :final initialSelectedX,
         :final isStatic,
       ) =>
-        ChartSelection(
-          padding: padding,
-          bounds: bounds,
-          selectedX: selectedX,
-          initialSelectedX: initialSelectedX,
-          builder: builder,
-          isSticky: isSticky,
-          translation: translation,
-          isStatic: isStatic,
+        ValueListenableBuilder(
+          valueListenable: selectedXNotifier,
+          builder: (context, selectedX, child) => ChartSelection(
+            padding: padding,
+            bounds: bounds,
+            selectedX: selectedX,
+            initialSelectedX: initialSelectedX,
+            builder: builder,
+            isSticky: isSticky,
+            translation: translation,
+            isStatic: isStatic,
+          ),
         ),
       ChartLineLayer(
         :final items,
@@ -83,16 +86,19 @@ Widget getLayerWidget(
             negativeColor: negativeColor,
           ),
         ),
-      ChartBarLayer(:final items) => Padding(
-          padding: padding,
-          child: ChartBars(
-            bounds: bounds,
-            barStacks: items,
-            selectedBarStacks:
-                items.where((item) => item.x == selectedX).toList(),
-            onBarStackPressed: onXPressed != null
-                ? (barStack) => onXPressed(barStack.x)
-                : null,
+      ChartBarLayer(:final items) => ValueListenableBuilder(
+          valueListenable: selectedXNotifier,
+          builder: (context, selectedX, child) => Padding(
+            padding: padding,
+            child: ChartBars(
+              bounds: bounds,
+              barStacks: items,
+              selectedBarStacks:
+                  items.where((item) => item.x == selectedX).toList(),
+              onBarStackPressed: onXPressed != null
+                  ? (barStack) => onXPressed(barStack.x)
+                  : null,
+            ),
           ),
         ),
       ChartCursorLayer(:final builder, :final point) => Padding(
