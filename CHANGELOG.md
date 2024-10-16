@@ -1,3 +1,7 @@
+## 1.0.13
+
+- Performance improvements for charts with a lot of items
+
 ## 1.0.12
 
 - Use chargee_lints instead of defining lint rules in library itself
