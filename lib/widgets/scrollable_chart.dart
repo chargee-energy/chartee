@@ -181,7 +181,7 @@ class _ChartScrollViewState extends State<ChartScrollView> {
   void _updateSelectedItems() {
     final nearestX = nearestXForOffset(
       widget.bounds,
-      widget.items,
+      widget.items.map((item) => item.x).toSet(),
       _controller.offset,
       widget.contentWidth,
     );
@@ -327,7 +327,12 @@ class ScrollableChartPhysics extends ScrollPhysics {
   double _getTargetPixels(ScrollMetrics position) {
     final nearestX = position is ScrollableChartPosition
         ? position.nearestX
-        : nearestXForOffset(bounds, items, position.pixels, contentWidth);
+        : nearestXForOffset(
+            bounds,
+            items.map((item) => item.x).toSet(),
+            position.pixels,
+            contentWidth,
+          );
 
     if (nearestX == null) {
       return position.pixels;
@@ -406,8 +411,12 @@ class ScrollableChartPosition extends ScrollPositionWithSingleContext {
 
   double getPixelsFromX(double x) => bounds.getFractionX(x) * contentWidth;
 
-  double? getNearestXFromPixels(double pixels) =>
-      nearestXForOffset(bounds, items, pixels, contentWidth);
+  double? getNearestXFromPixels(double pixels) => nearestXForOffset(
+        bounds,
+        items.map((item) => item.x).toSet(),
+        pixels,
+        contentWidth,
+      );
 
   @override
   bool applyViewportDimension(double viewportDimension) {

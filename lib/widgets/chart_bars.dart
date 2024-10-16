@@ -9,25 +9,25 @@ class ChartBars extends StatelessWidget {
   final BoundingBox bounds;
   final List<BarStack> barStacks;
   final List<BarStack> selectedBarStacks;
-  final ValueChanged<BarStack>? onBarStackPressed;
+  final ValueChanged<double>? onXPressed;
 
   const ChartBars({
     super.key,
     required this.bounds,
     required this.barStacks,
     required this.selectedBarStacks,
-    this.onBarStackPressed,
+    this.onXPressed,
   });
 
-  BarStack? _findNearestBarStack(BuildContext context, Offset localPosition) {
+  double? _findNearestBarStack(BuildContext context, Offset localPosition) {
     if (barStacks.isEmpty) {
       return null;
     }
 
     final renderBox = context.findRenderObject() as RenderBox;
-    return nearestItemForOffset(
+    return nearestXForOffset(
       bounds,
-      barStacks,
+      barStacks.map((item) => item.x).toSet(),
       localPosition.dx,
       renderBox.size.width,
     );
@@ -38,9 +38,9 @@ class ChartBars extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTapUp: (details) {
-        final barStack = _findNearestBarStack(context, details.localPosition);
-        if (barStack != null) {
-          onBarStackPressed?.call(barStack);
+        final x = _findNearestBarStack(context, details.localPosition);
+        if (x != null) {
+          onXPressed?.call(x);
         }
       },
       child: CustomPaint(

@@ -1,35 +1,26 @@
-import 'package:collection/collection.dart';
-
 import '../models/bounding_box.dart';
-import '../models/chart_item.dart';
 
 double? nearestXForOffset(
   BoundingBox bounds,
-  List<ChartItem> items,
-  double offset,
-  double width,
-) =>
-    nearestItemForOffset(bounds, items, offset, width)?.x;
-
-Item? nearestItemForOffset<Item extends ChartItem>(
-  BoundingBox bounds,
-  List<Item> items,
+  Set<double> xValues,
   double offset,
   double width,
 ) {
-  if (items.isEmpty) {
+  if (xValues.isEmpty) {
     return null;
   }
 
   final fraction = offset / width;
-  final distances = items
-      .map(
-        (item) => (
-          item: item,
-          distance: (fraction - bounds.getFractionX(item.x)).abs(),
-        ),
-      )
-      .sorted((a, b) => ((a.distance - b.distance) * 100).toInt());
+  double minDistance = double.infinity;
+  double nearestX = xValues.first;
 
-  return distances.first.item;
+  for (final value in xValues) {
+    final distance = (fraction - bounds.getFractionX(value)).abs();
+    if (distance < minDistance) {
+      minDistance = distance;
+      nearestX = value;
+    }
+  }
+
+  return nearestX;
 }

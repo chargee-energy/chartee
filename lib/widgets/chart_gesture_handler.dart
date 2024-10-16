@@ -27,6 +27,21 @@ class ChartGestureHandler extends StatefulWidget {
 
 class _ChartGestureHandlerState extends State<ChartGestureHandler> {
   final ValueNotifier<double?> _selectedX = ValueNotifier(null);
+  Set<double> _xValues = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _xValues = widget.items.map((item) => item.x).toSet();
+  }
+
+  @override
+  void didUpdateWidget(covariant ChartGestureHandler oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.items != widget.items) {
+      _xValues = widget.items.map((item) => item.x).toSet();
+    }
+  }
 
   double? _findNearestX(Offset localPosition) {
     if (widget.items.isEmpty) {
@@ -37,13 +52,12 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
     final width = renderBox.size.width - widget.padding.horizontal;
     final x = localPosition.dx - widget.padding.left;
 
-    return nearestXForOffset(widget.bounds, widget.items, x, width);
+    return nearestXForOffset(widget.bounds, _xValues, x, width);
   }
 
   void _setSelectedX(double? x) {
     if (x != _selectedX.value) {
       widget.onSelectionChanged?.call(x);
-
       _selectedX.value = x;
     }
   }

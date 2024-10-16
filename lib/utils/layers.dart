@@ -95,9 +95,7 @@ Widget getLayerWidget(
               barStacks: items,
               selectedBarStacks:
                   items.where((item) => item.x == selectedX).toList(),
-              onBarStackPressed: onXPressed != null
-                  ? (barStack) => onXPressed(barStack.x)
-                  : null,
+              onXPressed: onXPressed,
             ),
           ),
         ),
