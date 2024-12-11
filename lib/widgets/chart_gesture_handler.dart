@@ -8,6 +8,7 @@ class ChartGestureHandler extends StatefulWidget {
   final EdgeInsets padding;
   final BoundingBox bounds;
   final List<ChartItem> items;
+  final bool Function(double? value)? allowSelection;
   final ValueChanged<double?>? onSelectionChanged;
   final Widget Function(BuildContext context, ValueNotifier<double?> selectedX)
       builder;
@@ -17,6 +18,7 @@ class ChartGestureHandler extends StatefulWidget {
     required this.padding,
     required this.bounds,
     required this.items,
+    required this.allowSelection,
     required this.onSelectionChanged,
     required this.builder,
   });
@@ -56,7 +58,7 @@ class _ChartGestureHandlerState extends State<ChartGestureHandler> {
   }
 
   void _setSelectedX(double? x) {
-    if (x != _selectedX.value) {
+    if (x != _selectedX.value && (widget.allowSelection?.call(x) ?? true)) {
       widget.onSelectionChanged?.call(x);
       _selectedX.value = x;
     }

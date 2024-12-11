@@ -1,3 +1,7 @@
+## 1.0.14
+
+- Added callback to allow selection only for specified items
+
 ## 1.0.13
 
 - Performance improvements for charts with a lot of items
