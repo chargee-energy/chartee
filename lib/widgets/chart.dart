@@ -72,7 +72,10 @@ class Chart extends StatelessWidget {
         onSelectionChanged: onSelectionChanged,
         builder: (context, selectedX) => Stack(
           fit: StackFit.expand,
-          children: layers
+          children: [leftLabels, rightLabels, topLabels, bottomLabels]
+                  .whereNotNull()
+                  .toList() +
+                  layers
                   .map(
                     (layer) => getLayerWidget(
                       context,
@@ -83,11 +86,7 @@ class Chart extends StatelessWidget {
                       selectedX,
                       contentPadding,
                     ),
-                  )
-                  .toList() +
-              [leftLabels, rightLabels, topLabels, bottomLabels]
-                  .whereNotNull()
-                  .toList(),
+                  ).toList(),
         ),
       ),
     );
