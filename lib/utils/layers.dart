@@ -60,6 +60,7 @@ Widget getLayerWidget(
         :final negativeColor,
         :final lineWidth,
         :final dashArray,
+        :final smoothness,
       ) =>
         Padding(
           padding: padding,
@@ -70,12 +71,14 @@ Widget getLayerWidget(
             negativeColor: negativeColor,
             lineWidth: lineWidth,
             dashArray: dashArray,
+            smoothness: smoothness,
           ),
         ),
       ChartAreaLayer(
         :final items,
         :final positiveColor,
         :final negativeColor,
+        :final smoothness,
       ) =>
         Padding(
           padding: padding,
@@ -84,6 +87,7 @@ Widget getLayerWidget(
             points: items,
             positiveColor: positiveColor,
             negativeColor: negativeColor,
+            smoothness: smoothness,
           ),
         ),
       ChartBarLayer(:final items) => ValueListenableBuilder(

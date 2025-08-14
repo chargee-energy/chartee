@@ -210,7 +210,7 @@ class ChartBase extends StatelessWidget {
                   );
                 },
               )
-              .whereNotNull()
+              .nonNulls
               .toList()
           : null;
 

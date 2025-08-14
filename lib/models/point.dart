@@ -17,6 +17,12 @@ class Point extends ChartItem {
   /// The [y] parameter is the y-coordinate of the point.
   const Point({required super.x, required this.y});
 
+  Point operator +(Point other) => Point(x: x + other.x, y: y + other.y);
+
+  Point operator -(Point other) => Point(x: x - other.x, y: y - other.y);
+
+  Point operator *(double value) => Point(x: x * value, y: y * value);
+
   @override
   List<Object?> get props => [...super.props, y];
 }

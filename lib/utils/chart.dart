@@ -1,7 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:collection/collection.dart';
-
 import '../models/bounding_box.dart';
 import '../models/chart_item.dart';
 
@@ -40,7 +38,7 @@ class OutlineXIntervals implements IntervalsProvider {
 
   @override
   List<double> get intervals =>
-      [bounds.minX, bounds.maxX].whereNotNull().toList();
+      [bounds.minX, bounds.maxX].nonNulls.toList();
 
   const OutlineXIntervals({required this.bounds});
 

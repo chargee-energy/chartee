@@ -11,6 +11,7 @@ class ChartArea extends StatelessWidget {
   final List<Point> points;
   final Color positiveColor;
   final Color negativeColor;
+  final double? smoothness;
 
   const ChartArea({
     super.key,
@@ -18,6 +19,7 @@ class ChartArea extends StatelessWidget {
     required this.points,
     required this.positiveColor,
     required this.negativeColor,
+    required this.smoothness,
   });
 
   @override
@@ -30,6 +32,7 @@ class ChartArea extends StatelessWidget {
           points: points,
           positiveColor: positiveColor,
           negativeColor: negativeColor,
+          smoothness: smoothness,
         ),
       ),
     );
@@ -41,6 +44,7 @@ class _AreaPainter extends CustomPainter {
   final List<Point> points;
   final Color positiveColor;
   final Color negativeColor;
+  final double? smoothness;
 
   late final _positivePaint = Paint()..color = positiveColor;
   late final _negativePaint = Paint()..color = negativeColor;
@@ -50,6 +54,7 @@ class _AreaPainter extends CustomPainter {
     required this.points,
     required this.positiveColor,
     required this.negativeColor,
+    required this.smoothness,
   });
 
   @override
@@ -66,6 +71,7 @@ class _AreaPainter extends CustomPainter {
       bounds,
       points,
       closePath: true,
+      smoothness: smoothness,
     );
 
     if (path != null) {

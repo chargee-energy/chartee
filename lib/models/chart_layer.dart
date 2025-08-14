@@ -6,8 +6,8 @@ import 'bar_stack.dart';
 import 'bounding_box.dart';
 import 'chart_item.dart';
 import 'cursor_builder.dart';
-import 'point.dart';
 import 'grid_line.dart';
+import 'point.dart';
 import 'selection_overlay_builder.dart';
 import 'widget_builder.dart';
 
@@ -181,18 +181,23 @@ class ChartLineLayer extends ChartItemLayer<Point> {
   /// The dash pattern for the line, if any.
   final List<double>? dashArray;
 
+  /// The smoothness of the line, if supplied the line will curve instead of hitting the exact points.
+  final double? smoothness;
+
   /// Creates a new instance of ChartLineLayer with the specified parameters.
   ///
   /// The [items] parameter is required and represents the list of points to connect with lines.
   /// The [positiveColor] and [negativeColor] define the colors for positive and negative values respectively.
   /// The [lineWidth] specifies the width of the line (default is 1).
   /// The [dashArray] is an optional list of values defining the dash pattern for the line.
+  /// The [smoothness] is an optional value to smooth the line.
   const ChartLineLayer({
     required super.items,
     required this.positiveColor,
     required this.negativeColor,
     this.lineWidth = 1,
     this.dashArray,
+    this.smoothness,
   });
 
   @override
@@ -202,6 +207,7 @@ class ChartLineLayer extends ChartItemLayer<Point> {
         negativeColor,
         lineWidth,
         dashArray,
+        smoothness,
       ];
 }
 
@@ -215,18 +221,28 @@ class ChartAreaLayer extends ChartItemLayer<Point> {
   /// The color of the area when the value is negative.
   final Color negativeColor;
 
+  /// The smoothness of the line, if supplied the line will curve instead of hitting the exact points.
+  final double? smoothness;
+
   /// Creates a new instance of ChartAreaLayer with the specified parameters.
   ///
   /// The [items] parameter is required and represents the list of points defining the area.
   /// The [positiveColor] and [negativeColor] define the colors for positive and negative areas respectively.
+  /// The [smoothness] is an optional value to smooth the line.
   const ChartAreaLayer({
     required super.items,
     required this.positiveColor,
     required this.negativeColor,
+    this.smoothness,
   });
 
   @override
-  List<Object?> get props => [...super.props, positiveColor, negativeColor];
+  List<Object?> get props => [
+        ...super.props,
+        positiveColor,
+        negativeColor,
+        smoothness,
+      ];
 }
 
 /// Represents a layer in a chart that displays a cursor at a specific point.

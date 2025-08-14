@@ -1,5 +1,3 @@
-library chartee;
-
 export 'models/bar_stack.dart';
 export 'models/bar.dart';
 export 'models/bounding_box.dart';

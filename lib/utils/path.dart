@@ -40,37 +40,61 @@ Path? createPathFromChartPoints(
   BoundingBox bounds,
   List<Point> points, {
   bool closePath = false,
+  double? smoothness,
 }) {
   if (points.length < 2) {
     return null;
   }
 
-  final zeroFraction = bounds.getFractionY(0);
-  final firstPoint = _getOffset(bounds, points.first, size);
   final path = Path();
+  final zeroFraction = bounds.getFractionY(0);
+  final scaledPoints =
+      points.map((point) => _getScaledPoint(bounds, point, size)).toList();
 
   if (closePath) {
     path
-      ..moveTo(firstPoint.dx, size.height * zeroFraction.clamp(0, 1))
-      ..lineTo(firstPoint.dx, firstPoint.dy);
+      ..moveTo(scaledPoints.first.x, size.height * zeroFraction.clamp(0, 1))
+      ..lineTo(scaledPoints.first.x, scaledPoints.first.y);
   } else {
-    path.moveTo(firstPoint.dx, firstPoint.dy);
+    path.moveTo(scaledPoints.first.x, scaledPoints.first.y);
   }
 
-  for (var i = 1; i < points.length; i++) {
-    final point = _getOffset(bounds, points[i], size);
-    path.lineTo(point.dx, point.dy);
+  if (smoothness == null) {
+    _createSimplePath(path, scaledPoints);
+  } else {
+    _createSmoothPath(path, scaledPoints, smoothness);
   }
 
   if (closePath) {
-    final lastPoint = _getOffset(bounds, points.last, size);
-    path.lineTo(lastPoint.dx, size.height * zeroFraction.clamp(0, 1));
+    path.lineTo(scaledPoints.last.x, size.height * zeroFraction.clamp(0, 1));
   }
 
   return path;
 }
 
-Offset _getOffset(BoundingBox bounds, Point point, Size size) => Offset(
-      bounds.getFractionX(point.x) * size.width,
-      bounds.getFractionY(point.y) * size.height,
+void _createSimplePath(Path path, List<Point> points) {
+  for (var i = 1; i < points.length; i++) {
+    path.lineTo(points[i].x, points[i].y);
+  }
+}
+
+void _createSmoothPath(Path path, List<Point> points, double tension) {
+  for (var i = 0; i < points.length - 1; i++) {
+    // Catmull-Rom needs P0 and P3 for tangent calculation
+    final p0 = i > 0 ? points[i - 1] : points[i];
+    final p1 = points[i];
+    final p2 = points[i + 1];
+    final p3 = (i + 2 < points.length) ? points[i + 2] : p2;
+
+    // Control points
+    final cp1 = p1 + (p2 - p0) * (tension / 6);
+    final cp2 = p2 - (p3 - p1) * (tension / 6);
+
+    path.cubicTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y);
+  }
+}
+
+Point _getScaledPoint(BoundingBox bounds, Point point, Size size) => Point(
+      x: bounds.getFractionX(point.x) * size.width,
+      y: bounds.getFractionY(point.y) * size.height,
     );

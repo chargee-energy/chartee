@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../models/bounding_box.dart';
@@ -17,7 +16,7 @@ class Chart extends StatelessWidget {
   final Labels? rightLabels;
   final Labels? topLabels;
   final Labels? bottomLabels;
-  final bool Function(double? value)? allowSelection;
+  final bool Function(double? x)? allowSelection;
   final ValueChanged<double?>? onSelectionChanged;
   final BoundsAdjuster adjustBounds;
   final IntervalsProvider Function(BoundingBox bounds, List<ChartItem> items)
@@ -86,7 +85,7 @@ class Chart extends StatelessWidget {
                   )
                   .toList() +
               [leftLabels, rightLabels, topLabels, bottomLabels]
-                  .whereNotNull()
+                  .nonNulls
                   .toList(),
         ),
       ),

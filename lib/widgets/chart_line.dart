@@ -13,6 +13,7 @@ class ChartLine extends StatelessWidget {
   final Color negativeColor;
   final double lineWidth;
   final List<double>? dashArray;
+  final double? smoothness;
 
   const ChartLine({
     super.key,
@@ -22,6 +23,7 @@ class ChartLine extends StatelessWidget {
     required this.negativeColor,
     required this.lineWidth,
     required this.dashArray,
+    required this.smoothness,
   });
 
   @override
@@ -36,6 +38,7 @@ class ChartLine extends StatelessWidget {
           negativeColor: negativeColor,
           lineWidth: lineWidth,
           dashArray: dashArray,
+          smoothness: smoothness,
         ),
       ),
     );
@@ -49,6 +52,7 @@ class _LinePainter extends CustomPainter {
   final Color negativeColor;
   final double lineWidth;
   final List<double>? dashArray;
+  final double? smoothness;
 
   late final _positivePaint = Paint()
     ..style = PaintingStyle.stroke
@@ -67,6 +71,7 @@ class _LinePainter extends CustomPainter {
     required this.negativeColor,
     required this.lineWidth,
     required this.dashArray,
+    required this.smoothness,
   });
 
   @override
@@ -80,7 +85,8 @@ class _LinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    var path = createPathFromChartPoints(size, bounds, points);
+    var path =
+        createPathFromChartPoints(size, bounds, points, smoothness: smoothness);
 
     if (path != null) {
       if (dashArray case final dashArray?) {
