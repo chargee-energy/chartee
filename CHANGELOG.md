@@ -1,3 +1,10 @@
+## 1.0.15
+
+- Added smoothness option to line and area chart layers
+- Added solid and gradient options to line layers
+- **Breaking change** Line layers don't have a default constructor anymore to support different variations, to get the
+  same result as with the default constructor before you can use `ChartLineLayer.positiveNegative`
+
 ## 1.0.14
 
 - Added callback to allow selection only for specified items
@@ -18,9 +25,11 @@
 
 - Added `ScrollableChart` widget to create charts that can scroll horizontally
 - Added `isStatic` property to chart layers to determine if they should scroll or stay in place in a `ScrollableChart`
-- **Breaking change**: Because grid layers are split up in separate vertical and horizontal layers `ChartGridLayer.all` returns a list of 2 layers now instead of a single layer
+- **Breaking change**: Because grid layers are split up in separate vertical and horizontal layers `ChartGridLayer.all`
+  returns a list of 2 layers now instead of a single layer
 - **Breaking change**: Chart selections are no longer based on `ChartItem`, they work purely with `x` values now
-- **Breaking change**: The property `sticky` of `ChartSelectionLayer` is renamed to `isSticky` to be consistent with the added `isStatic` property on all layers
+- **Breaking change**: The property `sticky` of `ChartSelectionLayer` is renamed to `isSticky` to be consistent with the
+  added `isStatic` property on all layers
 
 ## 1.0.9
 

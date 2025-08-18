@@ -170,10 +170,13 @@ class ChartBarLayer extends ChartItemLayer<BarStack> {
 /// This class extends [ChartItemLayer] and specializes in handling lines.
 class ChartLineLayer extends ChartItemLayer<Point> {
   /// The color of the line when the value is positive.
-  final Color positiveColor;
+  final Color? positiveColor;
 
   /// The color of the line when the value is negative.
-  final Color negativeColor;
+  final Color? negativeColor;
+
+  /// The colors of the line at each y value.
+  final Map<double, Color>? colors;
 
   /// The width of the line.
   final double lineWidth;
@@ -184,27 +187,63 @@ class ChartLineLayer extends ChartItemLayer<Point> {
   /// The smoothness of the line, if supplied the line will curve instead of hitting the exact points.
   final double? smoothness;
 
-  /// Creates a new instance of ChartLineLayer with the specified parameters.
+  /// Creates a new instance of ChartLineLayer with one solid color for the complete line.
+  ///
+  /// The [items] parameter is required and represents the list of points to connect with lines.
+  /// The [color] defines the color of the line.
+  /// The [lineWidth] specifies the width of the line (default is 1).
+  /// The [dashArray] is an optional list of values defining the dash pattern for the line.
+  /// The [smoothness] is an optional value to smooth the line.
+  const ChartLineLayer.solid({
+    required super.items,
+    required Color color,
+    this.lineWidth = 1,
+    this.dashArray,
+    this.smoothness,
+  })  : positiveColor = color,
+        negativeColor = null,
+        colors = null;
+
+  /// Creates a new instance of ChartLineLayer with different colors for the positive and negative portion of the chart.
   ///
   /// The [items] parameter is required and represents the list of points to connect with lines.
   /// The [positiveColor] and [negativeColor] define the colors for positive and negative values respectively.
   /// The [lineWidth] specifies the width of the line (default is 1).
   /// The [dashArray] is an optional list of values defining the dash pattern for the line.
   /// The [smoothness] is an optional value to smooth the line.
-  const ChartLineLayer({
+  const ChartLineLayer.positiveNegative({
     required super.items,
     required this.positiveColor,
     required this.negativeColor,
     this.lineWidth = 1,
     this.dashArray,
     this.smoothness,
-  });
+  }) : colors = null;
+
+  /// Creates a new instance of ChartLineLayer where colors can be defined for y values resulting in a gradient.
+  ///
+  /// The [items] parameter is required and represents the list of points to connect with lines.
+  /// The [colors] define the colors for each supplied y value, this must have at least 2 values.
+  /// The [lineWidth] specifies the width of the line (default is 1).
+  /// The [dashArray] is an optional list of values defining the dash pattern for the line.
+  /// The [smoothness] is an optional value to smooth the line.
+  ChartLineLayer.gradient({
+    required super.items,
+    required this.colors,
+    this.lineWidth = 1,
+    this.dashArray,
+    this.smoothness,
+  })  : positiveColor = null,
+        negativeColor = null {
+    assert(colors!.length >= 2);
+  }
 
   @override
   List<Object?> get props => [
         ...super.props,
         positiveColor,
         negativeColor,
+        colors,
         lineWidth,
         dashArray,
         smoothness,

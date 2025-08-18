@@ -313,19 +313,23 @@ class _MyAppState extends State<MyApp> {
                         ),
                       ],
                     ),
-                    const ChartLineLayer(
-                      items: [
+                    ChartLineLayer.gradient(
+                      items: const [
                         Point(x: 0, y: 11),
                         Point(x: 0.5, y: 20),
                         Point(x: 1, y: 13),
                         Point(x: 2, y: 12),
                         Point(x: 3, y: 14),
                         Point(x: 4, y: 11),
-                        Point(x: 5, y: 12),
+                        Point(x: 5, y: -12),
                         Point(x: 6, y: 10),
                       ],
-                      positiveColor: Colors.green,
-                      negativeColor: Colors.orange,
+                      lineWidth: 4,
+                      colors: {
+                        0: Colors.red,
+                        -10: Colors.blue,
+                        10: Colors.green,
+                      },
                       smoothness: 1,
                     ),
                     ChartSelectionLayer(
