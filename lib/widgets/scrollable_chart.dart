@@ -163,6 +163,7 @@ class _ChartScrollViewState extends State<ChartScrollView> {
   void _initController() {
     _controller = widget.controller ?? ScrollableChartController();
     _controller.init(
+      owner: this,
       bounds: widget.bounds,
       items: widget.items,
       contentWidth: widget.contentWidth,
@@ -172,7 +173,7 @@ class _ChartScrollViewState extends State<ChartScrollView> {
 
   void _unlinkController(bool dispose) {
     _controller.removeListener(_updateSelectedItems);
-    _controller.reset();
+    _controller.reset(owner: this);
     if (dispose) {
       _controller.dispose();
     }
@@ -446,6 +447,7 @@ class ScrollableChartPosition extends ScrollPositionWithSingleContext {
 class ScrollableChartController extends ScrollController {
   final double? initialX;
 
+  Object? _owner;
   BoundingBox? _bounds;
   List<ChartItem>? _items;
   double? _contentWidth;
@@ -472,16 +474,22 @@ class ScrollableChartController extends ScrollController {
   });
 
   void init({
+    required Object owner,
     required BoundingBox bounds,
     required List<ChartItem> items,
     required double contentWidth,
   }) {
+    _owner = owner;
     _bounds = bounds;
     _items = items;
     _contentWidth = contentWidth;
   }
 
-  void reset() {
+  void reset({required Object owner}) {
+    if (!identical(_owner, owner)) {
+      return;
+    }
+    _owner = null;
     _bounds = null;
     _items = null;
     _contentWidth = null;

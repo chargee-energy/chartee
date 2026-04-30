@@ -11,6 +11,7 @@ class AdjustBounds {
 
 abstract interface class IntervalsProvider {
   BoundingBox get adjustedBounds;
+
   List<double> get intervals;
 }
 
@@ -37,8 +38,7 @@ class OutlineXIntervals implements IntervalsProvider {
   BoundingBox get adjustedBounds => bounds;
 
   @override
-  List<double> get intervals =>
-      [bounds.minX, bounds.maxX].nonNulls.toList();
+  List<double> get intervals => [bounds.minX, bounds.maxX].nonNulls.toList();
 
   const OutlineXIntervals({required this.bounds});
 

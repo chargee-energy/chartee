@@ -1,3 +1,7 @@
+## 1.0.16
+
+- Guard `ScrollableChartController.reset` with an owner token so a stale `_ChartScrollViewState.dispose` from a previous mount can no longer clear values that the current owner just wrote during `init`. Fixes intermittent `'_bounds != null && _items != null && _contentWidth != null'` assertions when the chart subtree is remounted while sharing a user-provided controller (e.g. when an ancestor toggles its widget tree shape).
+
 ## 1.0.15
 
 - Added smoothness option to line and area chart layers
