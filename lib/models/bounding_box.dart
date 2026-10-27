@@ -8,7 +8,7 @@ import '../errors/unbounded_error.dart';
 ///
 /// This class can be used to represent a rectangular area in a coordinate system, where the bounds can be either fixed or flexible.
 /// It includes methods for merging multiple bounding boxes and calculating fractional positions within the bounds.
-class BoundingBox with EquatableMixin {
+class BoundingBox with Equatable {
   /// The minimum X coordinate of the bounding box. Can be null for a flexible bounding box.
   final double? minX;
 

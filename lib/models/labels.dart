@@ -4,7 +4,7 @@ import 'package:flutter/painting.dart';
 /// A class representing labels configuration for a chart.
 ///
 /// Labels contain information about text, alignment, padding, offset, and style.
-class Labels with EquatableMixin {
+class Labels with Equatable {
   /// A function that returns the label text based on the index and value.
   final String Function(int index, double value)? getLabelText;
 

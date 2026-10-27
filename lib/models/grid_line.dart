@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 /// Represents a grid line used for styling grid lines in a chart.
 ///
 /// A [GridLine] can have a specific [color], [width], [dashArray], and [extendBehindLabels] property.
-class GridLine with EquatableMixin {
+class GridLine with Equatable {
   /// The color of the grid line.
   final Color color;
 

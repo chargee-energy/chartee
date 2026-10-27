@@ -15,7 +15,7 @@ import 'widget_builder.dart';
 ///
 /// This class serves as a base class for different types of chart layers.
 /// Subclasses should override the `bounds` getter to define the bounding box of the layer.
-sealed class ChartLayer with EquatableMixin {
+sealed class ChartLayer with Equatable {
   /// Returns the bounding box of the chart layer.
   BoundingBox get bounds;
 

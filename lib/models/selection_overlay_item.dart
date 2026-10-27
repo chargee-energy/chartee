@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 /// Represents an item for a selection overlay.
 ///
 /// This class is used to define an item that can be displayed in a selection overlay.
-class SelectionOverlayItem with EquatableMixin {
+class SelectionOverlayItem with Equatable {
   /// The widget to be displayed as the item.
   final Widget widget;
 

@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/painting.dart';
 
 /// Represents a bar with specific values and styling properties.
-class Bar with EquatableMixin {
+class Bar with Equatable {
   /// The starting value of the bar.
   final double fromValue;
 

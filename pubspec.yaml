@@ -9,12 +9,12 @@ environment:
 
 dependencies:
   collection: ^1.17.2
-  equatable: ^2.0.5
+  equatable: ^3.0.0
   flutter:
     sdk: flutter
 
 dev_dependencies:
-  chargee_lints: ^1.0.3
-  flutter_lints: ^5.0.0
+  chargee_lints: ^1.0.4
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter

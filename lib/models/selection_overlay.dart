@@ -11,7 +11,7 @@ import 'selection_overlay_item.dart';
 /// See also:
 ///   - [SingleChildSelectionOverlay]
 ///   - [ColumnSelectionOverlay]
-sealed class SelectionOverlay with EquatableMixin {
+sealed class SelectionOverlay with Equatable {
   /// Creates a [SelectionOverlay].
   const SelectionOverlay();
 

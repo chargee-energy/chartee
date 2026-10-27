@@ -5,7 +5,7 @@ import 'bounding_box.dart';
 /// Represents an abstract chart item.
 ///
 /// This class serves as a base class for chart items and provides common properties and methods.
-abstract class ChartItem with EquatableMixin {
+abstract class ChartItem with Equatable {
   /// The x-coordinate of the chart item.
   final double x;
 
