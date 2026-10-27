@@ -7,14 +7,6 @@ on:
 
 jobs:
   publishing:
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@main # required!
-
-      - name: ">> Dart package <<"
-        uses: k-paxian/dart-package-publisher@v1.6
-        with:
-          credentialJson: ${{ secrets.CREDENTIAL_JSON }}
-          skipTests: true
-          flutter: true
+    permissions:
+      id-token: write # required for pub.dev automated publishing
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
